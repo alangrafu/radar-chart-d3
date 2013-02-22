@@ -1,0 +1,38 @@
+<html>
+<head>
+<style>
+.line {
+  stroke: grey;
+  stroke-width: 1px;
+}
+.levels {
+  fill: red;
+  stroke: lightgrey;
+  stroke-width: 0.5px;
+}
+.legend{
+	font-family: helvetica;
+	font-size:14px;
+}
+.marker{
+	fill: steelblue;
+	fill-opacity: .9;
+	stroke: black;
+	stroke-width:2px;
+
+}
+</style>
+</head>
+<body>
+<div id="chart"></div>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="../src/radar-chart.js"></script>
+<script>
+var d = [{variable: "strength", value: "13"}, {variable: "intelligence", value: "1"}, {variable: "charima", value: "15"},  {variable: "dexterity", value: "10"},  {variable: "luck", value: "10"}];
+
+
+
+RadarChart.draw("#chart", d);
+    </script>
+</body>
+</html>
