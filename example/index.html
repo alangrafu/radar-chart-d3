@@ -21,15 +21,33 @@
 	stroke-width:2px;
 
 }
+body{
+  font-family: sans-serif;
+}
 </style>
 </head>
 <body>
-<div id="chart"></div>
+<h2>Example of radar chart</h2>
+<h4><a href='https://github.com/alangrafu/radar-chart-d3'>https://github.com/alangrafu/radar-chart-d3</a></h4>
+<div id="chart" style='float:left'></div>
+<div style='float:left'>
+Code:
+<pre>
+d =[
+     {variable: "strength", value: 13},
+     {variable: "intelligence", value: 1},
+     {variable: "charisma", value: 15},
+     {variable: "dexterity", value: 10},
+     {variable: "luck", value: 7}
+];
+
+RadarChart.draw("#chart", d);
+
+</pre></div>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="../src/radar-chart.js"></script>
 <script>
-var d = [{variable: "strength", value: "13"}, {variable: "intelligence", value: "1"}, {variable: "charima", value: "15"},  {variable: "dexterity", value: "10"},  {variable: "luck", value: "10"}];
-
+var d = [{variable: "strength", value: 13}, {variable: "intelligence", value: 1}, {variable: "charisma", value: 15},  {variable: "dexterity", value: 10},  {variable: "luck", value: 9}];
 
 
 RadarChart.draw("#chart", d);
