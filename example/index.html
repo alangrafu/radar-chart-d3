@@ -1,30 +1,10 @@
 <html>
 <head>
-<style>
-.line {
-  stroke: grey;
-  stroke-width: 1px;
-}
-.levels {
-  fill: red;
-  stroke: lightgrey;
-  stroke-width: 0.5px;
-}
-.legend{
-	font-family: helvetica;
-	font-size:14px;
-}
-.marker{
-	fill: steelblue;
-	fill-opacity: .9;
-	stroke: black;
-	stroke-width:2px;
-
-}
-body{
-  font-family: sans-serif;
-}
-</style>
+      <link rel="logo" type="image/png" href="demo.png" />
+      <title>Demo Radar chart D3</title>
+      <style>
+      body{font-family: sans-serif}
+      </style>
 </head>
 <body>
 <h2>Example of radar chart</h2>
@@ -33,21 +13,55 @@ body{
 <div style='float:left'>
 Code:
 <pre>
-d =[
-     {variable: "strength", value: 13},
-     {variable: "intelligence", value: 1},
-     {variable: "charisma", value: 15},
-     {variable: "dexterity", value: 10},
-     {variable: "luck", value: 7}
+d = [
+     [
+       {axis: "strength", value: 13}, 
+       {axis: "intelligence", value: 1}, 
+       {axis: "charisma", value: 8},  
+       {axis: "dexterity", value: 4},  
+       {axis: "luck", value: 9}
+     ],[
+       {axis: "strength", value: 3}, 
+       {axis: "intelligence", value: 15}, 
+       {axis: "charisma", value: 4}, 
+       {axis: "dexterity", value: 1},  
+       {axis: "luck", value: 15}
+     ],[
+       {axis: "strength", value: 5}, 
+       {axis: "intelligence", value: 1}, 
+       {axis: "charisma", value: 16}, 
+       {axis: "dexterity", value: 10},  
+       {axis: "luck", value: 5}
+     ]
 ];
 
 RadarChart.draw("#chart", d);
 
 </pre></div>
 <script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="../src/radar-chart.js"></script>
+<script src="../src/radar-chart-min.js"></script>
 <script>
-var d = [{variable: "strength", value: 13}, {variable: "intelligence", value: 1}, {variable: "charisma", value: 15},  {variable: "dexterity", value: 10},  {variable: "luck", value: 9}];
+var d = [
+          [
+           {axis: "strength", value: 13}, 
+           {axis: "intelligence", value: 1}, 
+           {axis: "charisma", value: 8},  
+           {axis: "dexterity", value: 4},  
+           {axis: "luck", value: 9}
+          ],[
+           {axis: "strength", value: 3}, 
+           {axis: "intelligence", value: 15}, 
+           {axis: "charisma", value: 4}, 
+           {axis: "dexterity", value: 1},  
+           {axis: "luck", value: 15}
+          ],[
+           {axis: "strength", value: 5}, 
+           {axis: "intelligence", value: 1}, 
+           {axis: "charisma", value: 16}, 
+           {axis: "dexterity", value: 10},  
+           {axis: "luck", value: 5}
+          ]
+        ];
 
 
 RadarChart.draw("#chart", d);
