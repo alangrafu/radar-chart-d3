@@ -7,10 +7,11 @@ var RadarChart = {
      factor: 1, 
      factorLegend:.85,
      total: 4,
-     levels: 4,
+     levels: 3,
      maxValue: 1000,
      radians: 2 * Math.PI, 
      minDistance : 50,
+     opacityArea: 0.5
    }
    if(options != undefined){
     for(var i in options){
@@ -35,8 +36,10 @@ var RadarChart = {
  }
 
  var color = d3.scale.category10();
+
  series = 0;
  for(x in d){
+
   dataValues = [];
   y = d[x];
   d3.select(id+" g").selectAll(".nodes")
@@ -45,24 +48,26 @@ var RadarChart = {
       cfg.w/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.sin(i*cfg.radians/total)), 
       cfg.h/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.cos(i*cfg.radians/total))
       ]);
+
   });
   
+
   dataValues.push(dataValues[0]);
   d3.select(id+" g").selectAll(".area")
   .data([dataValues])
-  .enter().append("path")
-  .style("fill", function(j, i){return color(series)}).style("fill-opacity", .5)
-  .attr("d", d3.svg.area());
+  .enter().append("polygon").attr("class", "serie"+series).style("stroke-width", "2px").style("stroke", color(series))
+    .attr("points",function(d) {return d})  .style("fill", function(j, i){return color(series)}).style("fill-opacity", cfg.opacityArea)
+;
   series++;
 }
 series=0;
+
+
 for(x in d){
   y = d[x];
-
-
   d3.select(id+" g").selectAll(".nodes")
   .data(y).enter()
-  .append("svg:circle")
+.append("svg:circle").attr("class", "serie"+series)
   .attr('r', cfg.radius)
   .attr("alt", function(j){return Math.max(j.value, 0)})
   .attr("cx", function(j, i){
@@ -72,12 +77,23 @@ for(x in d){
       ]);
     return cfg.w/2*(1-(Math.max(j.value, 0)/cfg.maxValue)*cfg.factor*Math.sin(i*cfg.radians/total));
   })
-  .attr("cy", function(j, i){
+    .attr("cy", function(j, i){
     return cfg.h/2*(1-(Math.max(j.value, 0)/cfg.maxValue)*cfg.factor*Math.cos(i*cfg.radians/total));
   })
   .attr("data-id", function(j){return j.axis})
   .style("fill", color(series)).style("fill-opacity", .9)
-  .style("stroke", "black")    .append("svg:title").text(function(j){return Math.max(j.value, 0)})
+  .style("stroke", "black")
+  .on('mouseover', function(){
+                    z = "polygon."+d3.select(this).attr("class");
+                    g.selectAll("polygon").style("fill-opacity", 0.1); 
+                    g.selectAll(z).style("fill-opacity", .9);
+                  })
+  .on('mouseout', function(){
+                    g.selectAll("polygon").style("fill-opacity", cfg.opacityArea)
+                  })
+  .append("svg:title")
+  .text(function(j){return Math.max(j.value, 0)});
+
   series++;
 }
 var axis = g.selectAll(".axis").data(allAxis).enter().append("g").attr("class", "axis");
