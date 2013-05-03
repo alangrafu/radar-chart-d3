@@ -24,6 +24,7 @@ var RadarChart = {
     var allAxis = (d[0].map(function(i, j){return i.axis}));
     total = allAxis.length;
     var radius = cfg.factor*Math.min(cfg.w/2, cfg.h/2);
+    d3.select(id).select("svg").remove();
     var g = d3.select(id).append("svg").attr("width", cfg.w).attr("height", cfg.h).append("g");
 
     for(var j=0; j<cfg.levels; j++){

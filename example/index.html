@@ -7,12 +7,13 @@
       </style>
 </head>
 <body>
-<h2>Example of radar chart</h2>
-<h4><a href='https://github.com/alangrafu/radar-chart-d3'>https://github.com/alangrafu/radar-chart-d3</a></h4>
-<div id="chart" style='float:left'></div>
-<div style='float:left'>
-Code:
-<pre>
+ <div style='width:100%;display:block;'>
+  <h2>Example of radar chart</h2>
+  <h4><a href='https://github.com/alangrafu/radar-chart-d3'>https://github.com/alangrafu/radar-chart-d3</a></h4>
+  <div id="chart" style='float:left'></div>
+  <div style='float:left'>
+   Code:
+   <pre>
 d = [
      [
            {axis: "strength", value: 13}, 
@@ -37,7 +38,16 @@ d = [
 
 RadarChart.draw("#chart", d);
 
-</pre></div>
+   </pre>
+  </div>
+ </div>
+ 
+<div style='width:100%;margin-top:700px;'>
+<h2>Dynamically-generated chart</h2>
+<a name="dynamic"></a>
+<div id="chart2" style='float:left'></div>
+<button onclick="newRadar();" style='float:left'>Press Me!</button>
+</div>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="../src/radar-chart-min.js"></script>
 <script>
@@ -65,6 +75,22 @@ var d = [
 
 
 RadarChart.draw("#chart", d);
-    </script>
+
+
+function newRadar(){
+  data = [];
+  for(var i=0; i<3; i++){
+    data.push([
+           {axis: "strength", value: Math.floor((Math.random()*100)+1)}, 
+           {axis: "intelligence", value: Math.floor((Math.random()*100)+1)}, 
+           {axis: "charisma", value: Math.floor((Math.random()*100)+1)}, 
+           {axis: "dexterity", value: Math.floor((Math.random()*100)+1)},  
+           {axis: "luck", value: Math.floor((Math.random()*100)+1)}
+          ])
+  }
+  RadarChart.draw("#chart2", data);
+}
+newRadar();
+</script>
 </body>
 </html>
