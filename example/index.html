@@ -77,6 +77,9 @@ var d = [
 RadarChart.draw("#chart", d);
 
 
+//This function generates a new array with 3 objects every time. The values for each axis are randomized
+//In order to re-generate the radar chart, you jsut need to run RadarChart.draw("#chart2", data) as usual.
+
 function newRadar(){
   data = [];
   for(var i=0; i<3; i++){
