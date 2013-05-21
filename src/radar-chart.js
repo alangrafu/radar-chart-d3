@@ -75,7 +75,13 @@ var RadarChart = {
                      .attr("class", "serie"+series)
                      .style("stroke-width", "2px")
                      .style("stroke", color(series))
-                     .attr("points",function(d) {return d})
+                     .attr("points",function(d) {
+                         var str="";
+                         for(var pti=0;pti<d.length;pti++){
+                             str=str+d[pti][0]+","+d[pti][1]+" ";
+                         }
+                         return str;
+                      })
                      .style("fill", function(j, i){return color(series)})
                      .style("fill-opacity", cfg.opacityArea)
                      .on('mouseover', function (d){
@@ -129,7 +135,7 @@ var RadarChart = {
     }
     //Tooltip
     tooltip = g.append('text').style('opacity', 0).style('font-family', 'sans-serif').style('font-size', 13);
-  },
+  }
 }
 
 
