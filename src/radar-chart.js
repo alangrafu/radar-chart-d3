@@ -56,9 +56,8 @@ var RadarChart = {
         .attr("y", function(d, i){return cfg.h/2*(1-Math.cos(i*cfg.radians/total))+20*Math.cos(i*cfg.radians/total);});
 
  
-    for(x in d){
+    d.forEach(function(y, x){
       dataValues = [];
-      y = d[x];
       d3.select(id+" g").selectAll(".nodes")
         .data(y, function(j, i){
           dataValues.push([
@@ -92,12 +91,11 @@ var RadarChart = {
                                         g.selectAll("polygon").transition(200).style("fill-opacity", cfg.opacityArea);
                      });
       series++;
-    }
+    });
     series=0;
 
 
-    for(x in d){
-      y = d[x];
+    d.forEach(function(y, x){
       d3.select(id+" g").selectAll(".nodes")
         .data(y).enter()
         .append("svg:circle").attr("class", "serie"+series)
@@ -131,7 +129,7 @@ var RadarChart = {
         .text(function(j){return Math.max(j.value, 0)});
 
       series++;
-    }
+    });
     //Tooltip
     tooltip = g.append('text').style('opacity', 0).style('font-family', 'sans-serif').style('font-size', 13);
   }
