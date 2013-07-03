@@ -1,21 +1,17 @@
 var RadarChart = {
-  g: null,
   draw: function(id, d, options){
-    var self = this;
     var cfg = {
      radius: 5,
-     w :600, 
-     h: 600, 
-     factor: 1, 
-     factorLegend:.85,
-     total: 4,
+     w: 600,
+     h: 600,
+     factor: 1,
+     factorLegend: .85,
      levels: 3,
-     maxValue: 1000,
-     radians: 2 * Math.PI, 
-     minDistance : 50,
+     maxValue: 0,
+     radians: 2 * Math.PI,
      opacityArea: 0.5,
      color: d3.scale.category10()
-   }
+    };
     if('undefined' !== typeof options){
       for(var i in options){
         if('undefined' !== typeof options[i]){
@@ -23,9 +19,9 @@ var RadarChart = {
         }
       }
     }
-    cfg.maxValue = d3.max(d, function(i){return Math.max.apply(Math,i.map(function(o){return o.value;}))});
+    cfg.maxValue = Math.max(cfg.maxValue, d3.max(d, function(i){return d3.max(i.map(function(o){return o.value;}))}));
     var allAxis = (d[0].map(function(i, j){return i.axis}));
-    total = allAxis.length;
+    var total = allAxis.length;
     var radius = cfg.factor*Math.min(cfg.w/2, cfg.h/2);
     d3.select(id).select("svg").remove();
     var g = d3.select(id).append("svg").attr("width", cfg.w).attr("height", cfg.h).append("g");
@@ -135,6 +131,4 @@ var RadarChart = {
     //Tooltip
     tooltip = g.append('text').style('opacity', 0).style('font-family', 'sans-serif').style('font-size', 13);
   }
-}
-
-
+};
