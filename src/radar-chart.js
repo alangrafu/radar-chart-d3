@@ -16,9 +16,11 @@ var RadarChart = {
      opacityArea: 0.5,
      color: d3.scale.category10()
    }
-    if(options != undefined){
+    if('undefined' !== typeof options){
       for(var i in options){
-        cfg[i] = options[i];
+        if('undefined' !== typeof options[i]){
+          cfg[i] = options[i];
+        }
       }
     }
     cfg.maxValue = d3.max(d, function(i){return Math.max.apply(Math,i.map(function(o){return o.value;}))});
