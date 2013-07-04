@@ -28,6 +28,8 @@ var RadarChart = {
     d3.select(id).select("svg").remove();
     var g = d3.select(id).append("svg").attr("width", cfg.w).attr("height", cfg.h).append("g");
 
+    var tooltip;
+
     for(var j=0; j<cfg.levels; j++){
       var levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
       g.selectAll(".levels").data(allAxis).enter().append("svg:line")
