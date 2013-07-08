@@ -58,7 +58,7 @@ var RadarChart = {
  
     d.forEach(function(y, x){
       dataValues = [];
-      d3.select(id+" g").selectAll(".nodes")
+      g.selectAll(".nodes")
         .data(y, function(j, i){
           dataValues.push([
             cfg.w/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.sin(i*cfg.radians/total)), 
@@ -66,7 +66,7 @@ var RadarChart = {
           ]);
         });
       dataValues.push(dataValues[0]);
-      g.select(id+" g").selectAll(".area")
+      g.selectAll(".area")
                      .data([dataValues])
                      .enter()
                      .append("polygon")
@@ -96,7 +96,7 @@ var RadarChart = {
 
 
     d.forEach(function(y, x){
-      d3.select(id+" g").selectAll(".nodes")
+      g.selectAll(".nodes")
         .data(y).enter()
         .append("svg:circle").attr("class", "serie"+series)
         .attr('r', cfg.radius)
