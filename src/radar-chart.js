@@ -70,7 +70,7 @@ var RadarChart = {
                      .data([dataValues])
                      .enter()
                      .append("polygon")
-                     .attr("class", "serie"+series)
+                     .attr("class", "radar-chart-serie"+series)
                      .style("stroke-width", "2px")
                      .style("stroke", cfg.color(series))
                      .attr("points",function(d) {
@@ -98,7 +98,7 @@ var RadarChart = {
     d.forEach(function(y, x){
       g.selectAll(".nodes")
         .data(y).enter()
-        .append("svg:circle").attr("class", "serie"+series)
+        .append("svg:circle").attr("class", "radar-chart-serie"+series)
         .attr('r', cfg.radius)
         .attr("alt", function(j){return Math.max(j.value, 0)})
         .attr("cx", function(j, i){
