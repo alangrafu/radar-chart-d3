@@ -4,13 +4,14 @@ var RadarChart = {
      radius: 5,
      w: 600,
      h: 600,
-     factor: 1,
-     factorLegend: .85,
+     factor: .95,
+     factorLegend: 1,
      levels: 3,
      maxValue: 0,
      radians: 2 * Math.PI,
      opacityArea: 0.5,
-     color: d3.scale.category10()
+     color: d3.scale.category10(),
+     fontSize: 10
     };
     if('undefined' !== typeof options){
       for(var i in options){
@@ -27,15 +28,25 @@ var RadarChart = {
     var g = d3.select(id).append("svg").attr("width", cfg.w).attr("height", cfg.h).append("g");
 
     var tooltip;
+    function getPosition(i, range, factor, func){
+      factor = typeof factor !== 'undefined' ? factor : 1;
+      return range * (1 - factor * func(i * cfg.radians / total));
+    }
+    function getHorizontalPosition(i, range, factor){
+      return getPosition(i, range, factor, Math.sin);
+    }
+    function getVerticalPosition(i, range, factor){
+      return getPosition(i, range, factor, Math.cos);
+    }
 
     for(var j=0; j<cfg.levels; j++){
-      var levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
+      var levelFactor = radius*((j+1)/cfg.levels);
       g.selectAll(".levels").data(allAxis).enter().append("svg:line")
-       .attr("x1", function(d, i){return levelFactor*(1-cfg.factor*Math.sin(i*cfg.radians/total));})
-       .attr("y1", function(d, i){return levelFactor*(1-cfg.factor*Math.cos(i*cfg.radians/total));})
-       .attr("x2", function(d, i){return levelFactor*(1-cfg.factor*Math.sin((i+1)*cfg.radians/total));})
-       .attr("y2", function(d, i){return levelFactor*(1-cfg.factor*Math.cos((i+1)*cfg.radians/total));})
-       .attr("class", "line").style("stroke", "grey").style("stroke-width", "0.5px").attr("transform", "translate(" + (cfg.w/2-levelFactor) + ", " + (cfg.h/2-levelFactor) + ")");;
+       .attr("x1", function(d, i){return getHorizontalPosition(i, levelFactor);})
+       .attr("y1", function(d, i){return getVerticalPosition(i, levelFactor);})
+       .attr("x2", function(d, i){return getHorizontalPosition(i+1, levelFactor);})
+       .attr("y2", function(d, i){return getVerticalPosition(i+1, levelFactor);})
+       .attr("class", "line").style("stroke", "grey").style("stroke-width", "0.5px").attr("transform", "translate(" + (cfg.w/2-levelFactor) + ", " + (cfg.h/2-levelFactor) + ")");
 
     }
 
@@ -46,14 +57,23 @@ var RadarChart = {
     axis.append("line")
         .attr("x1", cfg.w/2)
         .attr("y1", cfg.h/2)
-        .attr("x2", function(j, i){return cfg.w/2*(1-cfg.factor*Math.sin(i*cfg.radians/total));})
-        .attr("y2", function(j, i){return cfg.h/2*(1-cfg.factor*Math.cos(i*cfg.radians/total));})
+        .attr("x2", function(j, i){return getHorizontalPosition(i, cfg.w/2, cfg.factor);})
+        .attr("y2", function(j, i){return getVerticalPosition(i, cfg.h/2, cfg.factor);})
         .attr("class", "line").style("stroke", "grey").style("stroke-width", "1px");
 
     axis.append("text").attr("class", "legend")
-        .text(function(d){return d}).style("font-family", "sans-serif").style("font-size", "10px").attr("transform", function(d, i){return "translate(0, -10)"})
-        .attr("x", function(d, i){return cfg.w/2*(1-cfg.factorLegend*Math.sin(i*cfg.radians/total))-20*Math.sin(i*cfg.radians/total);})
-        .attr("y", function(d, i){return cfg.h/2*(1-Math.cos(i*cfg.radians/total))+20*Math.cos(i*cfg.radians/total);});
+        .text(function(d){return d})
+        .style("font-family", "sans-serif").style("font-size", cfg.fontSize + "px")
+        .style("text-anchor", function(d, i){
+          var p = getHorizontalPosition(i, 0.5);
+          return (p < 0.4) ? "start" : ((p > 0.6) ? "end" : "middle");
+        })
+        .attr("transform", function(d, i){
+          var p = getVerticalPosition(i, cfg.h / 2);
+          return p < cfg.fontSize ? "translate(0, " + (cfg.fontSize - p) + ")" : "";
+        })
+        .attr("x", function(d, i){return getHorizontalPosition(i, cfg.w / 2, cfg.factorLegend);})
+        .attr("y", function(d, i){return getVerticalPosition(i, cfg.h / 2, cfg.factorLegend);});
 
  
     d.forEach(function(y, x){
@@ -61,8 +81,8 @@ var RadarChart = {
       g.selectAll(".nodes")
         .data(y, function(j, i){
           dataValues.push([
-            cfg.w/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.sin(i*cfg.radians/total)), 
-            cfg.h/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.cos(i*cfg.radians/total))
+            getHorizontalPosition(i, cfg.w/2, (parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor),
+            getVerticalPosition(i, cfg.h/2, (parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor)
           ]);
         });
       dataValues.push(dataValues[0]);
@@ -103,13 +123,13 @@ var RadarChart = {
         .attr("alt", function(j){return Math.max(j.value, 0)})
         .attr("cx", function(j, i){
           dataValues.push([
-            cfg.w/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.sin(i*cfg.radians/total)), 
-            cfg.h/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.cos(i*cfg.radians/total))
-        ]);
-        return cfg.w/2*(1-(Math.max(j.value, 0)/cfg.maxValue)*cfg.factor*Math.sin(i*cfg.radians/total));
+            getHorizontalPosition(i, cfg.w/2, (parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor),
+            getVerticalPosition(i, cfg.h/2, (parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor)
+          ]);
+          return getHorizontalPosition(i, cfg.w/2, (Math.max(j.value, 0)/cfg.maxValue)*cfg.factor);
         })
         .attr("cy", function(j, i){
-          return cfg.h/2*(1-(Math.max(j.value, 0)/cfg.maxValue)*cfg.factor*Math.cos(i*cfg.radians/total));
+          return getVerticalPosition(i, cfg.h/2, (Math.max(j.value, 0)/cfg.maxValue)*cfg.factor);
         })
         .attr("data-id", function(j){return j.axis})
         .style("fill", cfg.color(series)).style("fill-opacity", .9)
