@@ -1,19 +1,15 @@
 {
   "name": "alangrafu/radar-chart-d3",
   "version": "1.0.0",
-  "main": "path/to/main.css",
-  "description": "please add it",
-  "license": "Eclipse",
+  "main": null,
+  "description": "Radar chart based on D3",
+  "license": "Apache",
   "ignore": [
     ".jshintrc",
     "**/*.txt"
   ],
   "dependencies": {
-    "<dependency_name>": "<semantic_version>",
-    "<dependency_name>": "<Local_folder>",
-    "<dependency_name>": "<package>"
   },
   "devDependencies": {
-    "<test-framework-name>": "<version>"
   }
 }
