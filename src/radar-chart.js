@@ -1,6 +1,7 @@
 var RadarChart = {
   draw: function(id, d, options){
     var cfg = {
+     containerClass: 'radar-chart',
      radius: 5,
      w: 600,
      h: 600,
@@ -9,23 +10,19 @@ var RadarChart = {
      levels: 3,
      maxValue: 0,
      radians: 2 * Math.PI,
-     opacityArea: 0.5,
-     color: d3.scale.category10(),
-     fontSize: 10
+     color: d3.scale.category10()
     };
-    if('undefined' !== typeof options){
-      for(var i in options){
-        if('undefined' !== typeof options[i]){
-          cfg[i] = options[i];
-        }
-      }
-    }
+
+    d3.entries(options || {}).forEach(function(option) {
+      cfg[option.key] = option.value;
+    });
+
     cfg.maxValue = Math.max(cfg.maxValue, d3.max(d, function(i){return d3.max(i.map(function(o){return o.value;}))}));
     var allAxis = (d[0].map(function(i, j){return i.axis}));
     var total = allAxis.length;
     var radius = cfg.factor*Math.min(cfg.w/2, cfg.h/2);
     d3.select(id).select("svg").remove();
-    var g = d3.select(id).append("svg").attr("width", cfg.w).attr("height", cfg.h).append("g");
+    var g = d3.select(id).append("svg").attr("width", cfg.w).attr("height", cfg.h).append("g").classed(cfg.containerClass, 1);
 
     var tooltip;
     function getPosition(i, range, factor, func){
@@ -41,12 +38,14 @@ var RadarChart = {
 
     for(var j=0; j<cfg.levels; j++){
       var levelFactor = radius*((j+1)/cfg.levels);
-      g.selectAll(".levels").data(allAxis).enter().append("svg:line")
+      // ToDo: refactor, this query relies on no element being found
+      //       should be switched to an proper selectAll() && data()
+      g.selectAll(".level404").data(allAxis).enter().append("svg:line")
        .attr("x1", function(d, i){return getHorizontalPosition(i, levelFactor);})
        .attr("y1", function(d, i){return getVerticalPosition(i, levelFactor);})
        .attr("x2", function(d, i){return getHorizontalPosition(i+1, levelFactor);})
        .attr("y2", function(d, i){return getVerticalPosition(i+1, levelFactor);})
-       .attr("class", "line").style("stroke", "grey").style("stroke-width", "0.5px").attr("transform", "translate(" + (cfg.w/2-levelFactor) + ", " + (cfg.h/2-levelFactor) + ")");
+       .attr("class", "level").attr("transform", "translate(" + (cfg.w/2-levelFactor) + ", " + (cfg.h/2-levelFactor) + ")");
 
     }
 
@@ -58,20 +57,20 @@ var RadarChart = {
         .attr("x1", cfg.w/2)
         .attr("y1", cfg.h/2)
         .attr("x2", function(j, i){return getHorizontalPosition(i, cfg.w/2, cfg.factor);})
-        .attr("y2", function(j, i){return getVerticalPosition(i, cfg.h/2, cfg.factor);})
-        .attr("class", "line").style("stroke", "grey").style("stroke-width", "1px");
+        .attr("y2", function(j, i){return getVerticalPosition(i, cfg.h/2, cfg.factor);});
 
-    axis.append("text").attr("class", "legend")
-        .text(function(d){return d})
-        .style("font-family", "sans-serif").style("font-size", cfg.fontSize + "px")
-        .style("text-anchor", function(d, i){
+    axis.append("text")
+        .attr("class", function(d, i){
           var p = getHorizontalPosition(i, 0.5);
-          return (p < 0.4) ? "start" : ((p > 0.6) ? "end" : "middle");
+          
+          return "legend " +
+            ((p < 0.4) ? "left" : ((p > 0.6) ? "right" : "middle"));
         })
-        .attr("transform", function(d, i){
-          var p = getVerticalPosition(i, cfg.h / 2);
-          return p < cfg.fontSize ? "translate(0, " + (cfg.fontSize - p) + ")" : "";
+        .attr('dy', function(d, i) {
+          var p = getVerticalPosition(i, 0.5);
+          return ((p < 0.1) ? "1em" : ((p > 0.9) ? "0" : "0.5em"));
         })
+        .text(function(d){return d;})
         .attr("x", function(d, i){return getHorizontalPosition(i, cfg.w / 2, cfg.factorLegend);})
         .attr("y", function(d, i){return getVerticalPosition(i, cfg.h / 2, cfg.factorLegend);});
 
@@ -86,12 +85,13 @@ var RadarChart = {
           ]);
         });
       dataValues.push(dataValues[0]);
-      g.selectAll(".area")
+      // ToDo: refactor, this query relies on no element being found
+      //       should be switched to an proper selectAll() && data()
+      g.selectAll(".area404")
                      .data([dataValues])
                      .enter()
                      .append("polygon")
-                     .attr("class", "radar-chart-serie"+series)
-                     .style("stroke-width", "2px")
+                     .attr("class", "area radar-chart-serie"+series)
                      .style("stroke", cfg.color(series))
                      .attr("points",function(d) {
                          var str="";
@@ -101,14 +101,13 @@ var RadarChart = {
                          return str;
                       })
                      .style("fill", function(j, i){return cfg.color(series)})
-                     .style("fill-opacity", cfg.opacityArea)
                      .on('mouseover', function (d){
-                                        z = "polygon."+d3.select(this).attr("class");
-                                        g.selectAll("polygon").transition(200).style("fill-opacity", 0.1); 
-                                        g.selectAll(z).transition(200).style("fill-opacity", .7);
-                                      })
+                        g.classed('focus', 1);
+                        d3.select(this).classed('focused', 1);
+                     })
                      .on('mouseout', function(){
-                                        g.selectAll("polygon").transition(200).style("fill-opacity", cfg.opacityArea);
+                        g.classed('focus', 0);
+                        d3.select(this).classed('focused', 0);
                      });
       series++;
     });
@@ -132,18 +131,22 @@ var RadarChart = {
           return getVerticalPosition(i, cfg.h/2, (Math.max(j.value, 0)/cfg.maxValue)*cfg.factor);
         })
         .attr("data-id", function(j){return j.axis})
-        .style("fill", cfg.color(series)).style("fill-opacity", .9)
+        .style("fill", cfg.color(series))
         .on('mouseover', function (d){
                     newX =  parseFloat(d3.select(this).attr('cx')) - 10;
                     newY =  parseFloat(d3.select(this).attr('cy')) - 5;
-                    tooltip.attr('x', newX).attr('y', newY).text(d.value).transition(200).style('opacity', 1);
+                    tooltip.attr('x', newX).attr('y', newY).text(d.value).classed('visible', 1);
+
                     z = "polygon."+d3.select(this).attr("class");
-                    g.selectAll("polygon").transition(200).style("fill-opacity", 0.1); 
-                    g.selectAll(z).transition(200).style("fill-opacity", .7);
+                    g.classed('focus', 1);
+                    d3.select(z).classed('focused', 1);
                   })
         .on('mouseout', function(){
-                    tooltip.transition(200).style('opacity', 0);
-                    g.selectAll("polygon").transition(200).style("fill-opacity", cfg.opacityArea);
+                    tooltip.classed('visible', 0);
+
+                    z = "polygon."+d3.select(this).attr("class");
+                    g.classed('focus', 0);
+                    d3.select(z).classed('focused', 0);
                   })
         .append("svg:title")
         .text(function(j){return Math.max(j.value, 0)});
@@ -151,6 +154,6 @@ var RadarChart = {
       series++;
     });
     //Tooltip
-    tooltip = g.append('text').style('opacity', 0).style('font-family', 'sans-serif').style('font-size', '13px');
+    tooltip = g.append('text').attr('class', 'tooltip');
   }
 };
