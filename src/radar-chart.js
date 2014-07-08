@@ -28,10 +28,6 @@ var RadarChart = {
 
         container.classed(cfg.containerClass, 1);
 
-        // tmp until each selector only redraws necessary stuff
-        container.selectAll('*').remove();
-
-        var tooltip;
         function getPosition(i, range, factor, func){
           factor = typeof factor !== 'undefined' ? factor : 1;
           return range * (1 - factor * func(i * cfg.radians / total));
@@ -43,145 +39,166 @@ var RadarChart = {
           return getPosition(i, range, factor, Math.cos);
         }
 
-        d3.range(0, cfg.levels).forEach(function(level) {
-          var levelFactor = radius * ((level + 1) / cfg.levels);
-
-          container.selectAll(".level404").data(allAxis).enter().append("svg:line")
-            .attr("x1", function(d, i){return getHorizontalPosition(i, levelFactor);})
-            .attr("y1", function(d, i){return getVerticalPosition(i, levelFactor);})
-            .attr("x2", function(d, i){return getHorizontalPosition(i+1, levelFactor);})
-            .attr("y2", function(d, i){return getVerticalPosition(i+1, levelFactor);})
-            .attr("class", "level").attr("transform", "translate(" + (cfg.w/2-levelFactor) + ", " + (cfg.h/2-levelFactor) + ")");
+        // levels && axises
+        var levelFactors = d3.range(0, cfg.levels).map(function(level) {
+          return radius * ((level + 1) / cfg.levels);
         });
 
-        series = 0;
+        var levelGroups = container.selectAll('g.level-group').data(levelFactors);
 
-        var axis = container.selectAll(".axis").data(allAxis).enter().append("g").attr("class", "axis");
+        levelGroups.enter().append('g');
+        levelGroups.exit().remove();
 
-        axis.append("line")
-            .attr("x1", cfg.w/2)
-            .attr("y1", cfg.h/2)
-            .attr("x2", function(j, i){return getHorizontalPosition(i, cfg.w/2, cfg.factor);})
-            .attr("y2", function(j, i){return getVerticalPosition(i, cfg.h/2, cfg.factor);});
+        levelGroups.attr('class', function(d, i) {
+          return 'level-group level-group-' + i;
+        });
 
-        axis.append("text")
-            .attr("class", function(d, i){
+        var levelLine = levelGroups.selectAll('.level').data(function(levelFactor) {
+          return d3.range(0, total).map(function() { return levelFactor; });
+        });
+
+        levelLine.enter().append('line');
+        levelLine.exit().remove();
+
+        levelLine
+          .attr('class', 'level')
+          .attr('x1', function(levelFactor, i){ return getHorizontalPosition(i, levelFactor); })
+          .attr('y1', function(levelFactor, i){ return getVerticalPosition(i, levelFactor); })
+          .attr('x2', function(levelFactor, i){ return getHorizontalPosition(i+1, levelFactor); })
+          .attr('y2', function(levelFactor, i){ return getVerticalPosition(i+1, levelFactor); })
+          .attr('transform', function(levelFactor) {
+            return 'translate(' + (cfg.w/2-levelFactor) + ', ' + (cfg.h/2-levelFactor) + ')';
+          });
+
+        var axis = container.selectAll('.axis').data(allAxis);
+
+        var newAxis = axis.enter().append('g');
+        newAxis.append('line');
+        newAxis.append('text');
+
+        axis.exit().remove();
+
+        axis.attr('class', 'axis');
+
+        axis.select('line')
+            .attr('x1', cfg.w/2)
+            .attr('y1', cfg.h/2)
+            .attr('x2', function(d, i) { return getHorizontalPosition(i, cfg.w / 2, cfg.factor); })
+            .attr('y2', function(d, i) { return getVerticalPosition(i, cfg.h / 2, cfg.factor); });
+
+        axis.select('text')
+            .attr('class', function(d, i){
               var p = getHorizontalPosition(i, 0.5);
-              
-              return "legend " +
-                ((p < 0.4) ? "left" : ((p > 0.6) ? "right" : "middle"));
+
+              return 'legend ' +
+                ((p < 0.4) ? 'left' : ((p > 0.6) ? 'right' : 'middle'));
             })
             .attr('dy', function(d, i) {
               var p = getVerticalPosition(i, 0.5);
-              return ((p < 0.1) ? "1em" : ((p > 0.9) ? "0" : "0.5em"));
+              return ((p < 0.1) ? '1em' : ((p > 0.9) ? '0' : '0.5em'));
             })
-            .text(function(d){return d;})
-            .attr("x", function(d, i){return getHorizontalPosition(i, cfg.w / 2, cfg.factorLegend);})
-            .attr("y", function(d, i){return getVerticalPosition(i, cfg.h / 2, cfg.factorLegend);});
+            .text(function(d) { return d; })
+            .attr('x', function(d, i){ return getHorizontalPosition(i, cfg.w / 2, cfg.factorLegend); })
+            .attr('y', function(d, i){ return getVerticalPosition(i, cfg.h / 2, cfg.factorLegend); });
 
-     
-        data.forEach(function(y, x){
-          dataValues = [];
-          container.selectAll(".nodes")
-            .data(y, function(j, i){
-              dataValues.push([
-                getHorizontalPosition(i, cfg.w/2, (parseFloat(Math.max(j.value, 0))/maxValue)*cfg.factor),
-                getVerticalPosition(i, cfg.h/2, (parseFloat(Math.max(j.value, 0))/maxValue)*cfg.factor)
-              ]);
-            });
-          dataValues.push(dataValues[0]);
-          // ToDo: refactor, this query relies on no element being found
-          //       should be switched to an proper selectAll() && data()
-          container.selectAll(".area404")
-                         .data([dataValues])
-                         .enter()
-                         .append("polygon")
-                         .attr("class", "area radar-chart-serie"+series)
-                         .style("stroke", cfg.color(series))
-                         .attr("points",function(d) {
-                             var str="";
-                             for(var pti=0;pti<d.length;pti++){
-                                 str=str+d[pti][0]+","+d[pti][1]+" ";
-                             }
-                             return str;
-                          })
-                         .style("fill", function(j, i) { return cfg.color(series); })
-                         .on('mouseover', function (d){
-                            container.classed('focus', 1);
-                            d3.select(this).classed('focused', 1);
-                         })
-                         .on('mouseout', function(){
-                            container.classed('focus', 0);
-                            d3.select(this).classed('focused', 0);
-                         });
-          series++;
+
+        // content
+        data.forEach(function(axes){
+          axes.forEach(function(axis, i) {
+            axis.x = getHorizontalPosition(i, cfg.w/2, (parseFloat(Math.max(axis.value, 0))/maxValue)*cfg.factor);
+            axis.y = getVerticalPosition(i, cfg.h/2, (parseFloat(Math.max(axis.value, 0))/maxValue)*cfg.factor);
+          });
         });
-        series=0;
+
+        var polygon = container.selectAll(".area").data(data);
+
+        polygon.enter().append('polygon');
+        polygon.exit().remove();
+
+        polygon
+          .attr('class', function(d, i) {
+            return 'area radar-chart-serie' + i;
+          })
+          .style('stroke', function(d, i) { return cfg.color(i); })
+          .style('fill', function(d, i) { return cfg.color(i); })
+          .attr('points',function(d) {
+            return d.map(function(p) {
+              return [p.x, p.y].join(',');
+            }).join(' ');
+          })
+          .on('mouseover', function (d){
+            container.classed('focus', 1);
+            d3.select(this).classed('focused', 1);
+          })
+          .on('mouseout', function(){
+            container.classed('focus', 0);
+            d3.select(this).classed('focused', 0);
+          });
 
 
-        data.forEach(function(y, x) {
-          container.selectAll(".nodes")
-            .data(y).enter()
-            .append("svg:circle").attr("class", "radar-chart-serie"+series)
-            .attr('r', cfg.radius)
-            .attr("alt", function(j){ return Math.max(j.value, 0); })
-            .attr("cx", function(j, i){
-              dataValues.push([
-                getHorizontalPosition(i, cfg.w/2, (parseFloat(Math.max(j.value, 0))/maxValue)*cfg.factor),
-                getVerticalPosition(i, cfg.h/2, (parseFloat(Math.max(j.value, 0))/maxValue)*cfg.factor)
-              ]);
-              return getHorizontalPosition(i, cfg.w/2, (Math.max(j.value, 0)/maxValue)*cfg.factor);
-            })
-            .attr("cy", function(j, i){
-              return getVerticalPosition(i, cfg.h/2, (Math.max(j.value, 0)/maxValue)*cfg.factor);
-            })
-            .attr("data-id", function(j){ return j.axis; })
-            .style("fill", cfg.color(series))
-            .on('mouseover', function (d){
-                        newX =  parseFloat(d3.select(this).attr('cx')) - 10;
-                        newY =  parseFloat(d3.select(this).attr('cy')) - 5;
-                        tooltip.attr('x', newX).attr('y', newY).text(d.value).classed('visible', 1);
+        var circleGroups = container.selectAll('g.circle').data(data);
 
-                        z = "polygon."+d3.select(this).attr("class");
-                        container.classed('focus', 1);
-                        d3.select(z).classed('focused', 1);
-                      })
-            .on('mouseout', function(){
-                        tooltip.classed('visible', 0);
+        circleGroups.enter().append('g').classed('circle', 1);
+        circleGroups.exit().remove();
 
-                        z = "polygon."+d3.select(this).attr("class");
-                        container.classed('focus', 0);
-                        d3.select(z).classed('focused', 0);
-                      })
-            .append("svg:title")
-            .text(function(j){ return Math.max(j.value, 0); });
-
-          series++;
+        var circle = circleGroups.selectAll('circle').data(function(axis, i) {
+          return axis.map(function(d) { return [d, i]; });
         });
-        //Tooltip
-        tooltip = container.append('text').attr('class', 'tooltip');
 
+        circle.enter().append('circle');
+        circle.exit().remove();
 
+        var tooltip = container.selectAll('.tooltip').data([1]);
+        tooltip.enter().append('text').attr('class', 'tooltip');
 
+        circle
+          .attr('class', function(d) {
+            return 'radar-chart-serie'+d[1];
+          })
+          .attr('r', cfg.radius)
+          .attr('cx', function(d) {
+            return d[0].x;
+          })
+          .attr('cy', function(d) {
+            return d[0].y;
+          })
+          .style('fill', function(d) { return cfg.color(d[1]); })
+          .on('mouseover', function(d){
+            tooltip
+              .attr('x', d[0].x - 10)
+              .attr('y', d[0].y - 5)
+              .text(d[0].value)
+              .classed('visible', 1);
 
+            container.classed('focus', 1);
+            container.select('.area.radar-chart-serie'+d[1]).classed('focused', 1);
+          })
+          .on('mouseout', function(d){
+            tooltip.classed('visible', 0);
 
+            container.classed('focus', 0);
+            container.select('.area.radar-chart-serie'+d[1]).classed('focused', 0);
+          });
 
+        // ensure tooltip is upmost layer
+        var tooltipEl = tooltip.node();
+        tooltipEl.parentNode.appendChild(tooltipEl); 
       });
     }
 
     radar.config = function(value) {
-        if(!arguments.length) {
-          return cfg;
-        }
-        if(arguments.length > 1) {
-          cfg[arguments[0]] = arguments[1];
-        }
-        else {
-          d3.entries(value || {}).forEach(function(option) {
-            cfg[option.key] = option.value;
-          });
-        }
-        return radar;
+      if(!arguments.length) {
+        return cfg;
+      }
+      if(arguments.length > 1) {
+        cfg[arguments[0]] = arguments[1];
+      }
+      else {
+        d3.entries(value || {}).forEach(function(option) {
+          cfg[option.key] = option.value;
+        });
+      }
+      return radar;
     };
 
     return radar;

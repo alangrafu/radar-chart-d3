@@ -82,9 +82,14 @@ RadarChart.draw("#chart", d);
 
 //This function generates a new array with 3 objects every time. The values for each axis are randomized
 //In order to re-generate the radar chart, you jsut need to run RadarChart.draw("#chart2", data) as usual.
+var chart2 = RadarChart.chart();
+var chart2cfg = chart2.config();
+var chart2svg = d3.select("#chart2").append("svg")
+  .attr("width", chart2cfg.w)
+  .attr("height", chart2cfg.h);
 
 function newRadar(){
-  data = [];
+  var data = [];
   for(var i=0; i<3; i++){
     data.push([
            {axis: "strength", value: Math.floor((Math.random()*100)+1)}, 
@@ -92,9 +97,11 @@ function newRadar(){
            {axis: "charisma", value: Math.floor((Math.random()*100)+1)}, 
            {axis: "dexterity", value: Math.floor((Math.random()*100)+1)},  
            {axis: "luck", value: Math.floor((Math.random()*100)+1)}
-          ])
+          ]);
   }
-  RadarChart.draw("#chart2", data);
+  chart2svg
+    .datum(data)
+    .call(chart2);
 }
 newRadar();
 </script>
