@@ -5,7 +5,7 @@ var RadarChart = {
      radius: 5,
      w: 600,
      h: 600,
-     factor: .95,
+     factor: 0.95,
      factorLegend: 1,
      levels: 3,
      maxValue: 0,
@@ -17,8 +17,10 @@ var RadarChart = {
       cfg[option.key] = option.value;
     });
 
-    cfg.maxValue = Math.max(cfg.maxValue, d3.max(d, function(i){return d3.max(i.map(function(o){return o.value;}))}));
-    var allAxis = (d[0].map(function(i, j){return i.axis}));
+    cfg.maxValue = Math.max(cfg.maxValue, d3.max(d, function(i){ 
+      return d3.max(i.map(function(o){return o.value;}));
+    }));
+    var allAxis = (d[0].map(function(i, j){return i.axis;}));
     var total = allAxis.length;
     var radius = cfg.factor*Math.min(cfg.w/2, cfg.h/2);
     d3.select(id).select("svg").remove();
@@ -36,18 +38,16 @@ var RadarChart = {
       return getPosition(i, range, factor, Math.cos);
     }
 
-    for(var j=0; j<cfg.levels; j++){
-      var levelFactor = radius*((j+1)/cfg.levels);
-      // ToDo: refactor, this query relies on no element being found
-      //       should be switched to an proper selectAll() && data()
-      g.selectAll(".level404").data(allAxis).enter().append("svg:line")
-       .attr("x1", function(d, i){return getHorizontalPosition(i, levelFactor);})
-       .attr("y1", function(d, i){return getVerticalPosition(i, levelFactor);})
-       .attr("x2", function(d, i){return getHorizontalPosition(i+1, levelFactor);})
-       .attr("y2", function(d, i){return getVerticalPosition(i+1, levelFactor);})
-       .attr("class", "level").attr("transform", "translate(" + (cfg.w/2-levelFactor) + ", " + (cfg.h/2-levelFactor) + ")");
+    d3.range(0, cfg.levels).forEach(function(level) {
+      var levelFactor = radius * ((level + 1) / cfg.levels);
 
-    }
+      g.selectAll(".level404").data(allAxis).enter().append("svg:line")
+        .attr("x1", function(d, i){return getHorizontalPosition(i, levelFactor);})
+        .attr("y1", function(d, i){return getVerticalPosition(i, levelFactor);})
+        .attr("x2", function(d, i){return getHorizontalPosition(i+1, levelFactor);})
+        .attr("y2", function(d, i){return getVerticalPosition(i+1, levelFactor);})
+        .attr("class", "level").attr("transform", "translate(" + (cfg.w/2-levelFactor) + ", " + (cfg.h/2-levelFactor) + ")");
+    });
 
     series = 0;
 
@@ -100,7 +100,7 @@ var RadarChart = {
                          }
                          return str;
                       })
-                     .style("fill", function(j, i){return cfg.color(series)})
+                     .style("fill", function(j, i) { return cfg.color(series); })
                      .on('mouseover', function (d){
                         g.classed('focus', 1);
                         d3.select(this).classed('focused', 1);
@@ -119,7 +119,7 @@ var RadarChart = {
         .data(y).enter()
         .append("svg:circle").attr("class", "radar-chart-serie"+series)
         .attr('r', cfg.radius)
-        .attr("alt", function(j){return Math.max(j.value, 0)})
+        .attr("alt", function(j){ return Math.max(j.value, 0); })
         .attr("cx", function(j, i){
           dataValues.push([
             getHorizontalPosition(i, cfg.w/2, (parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor),
@@ -130,7 +130,7 @@ var RadarChart = {
         .attr("cy", function(j, i){
           return getVerticalPosition(i, cfg.h/2, (Math.max(j.value, 0)/cfg.maxValue)*cfg.factor);
         })
-        .attr("data-id", function(j){return j.axis})
+        .attr("data-id", function(j){ return j.axis; })
         .style("fill", cfg.color(series))
         .on('mouseover', function (d){
                     newX =  parseFloat(d3.select(this).attr('cx')) - 10;
@@ -149,7 +149,7 @@ var RadarChart = {
                     d3.select(z).classed('focused', 0);
                   })
         .append("svg:title")
-        .text(function(j){return Math.max(j.value, 0)});
+        .text(function(j){ return Math.max(j.value, 0); });
 
       series++;
     });
