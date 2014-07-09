@@ -18,11 +18,19 @@ var RadarChart = {
       selection.each(function(data) {
         var container = d3.select(this);
 
+        // allow simple notation
+        data = data.map(function(datum) {
+          if(datum instanceof Array) {
+            datum = {axes: datum};
+          }
+          return datum;
+        });
+
         var maxValue = Math.max(cfg.maxValue, d3.max(data, function(d) { 
-          return d3.max(d, function(o){ return o.value; });
+          return d3.max(d.axes, function(o){ return o.value; });
         }));
 
-        var allAxis = data[0].map(function(i, j){ return i.axis; });
+        var allAxis = data[0].axes.map(function(i, j){ return i.axis; });
         var total = allAxis.length;
         var radius = cfg.factor * Math.min(cfg.w / 2, cfg.h / 2);
 
@@ -103,8 +111,8 @@ var RadarChart = {
 
 
         // content
-        data.forEach(function(axes){
-          axes.forEach(function(axis, i) {
+        data.forEach(function(d){
+          d.axes.forEach(function(axis, i) {
             axis.x = getHorizontalPosition(i, cfg.w/2, (parseFloat(Math.max(axis.value, 0))/maxValue)*cfg.factor);
             axis.y = getVerticalPosition(i, cfg.h/2, (parseFloat(Math.max(axis.value, 0))/maxValue)*cfg.factor);
           });
@@ -117,12 +125,12 @@ var RadarChart = {
 
         polygon
           .attr('class', function(d, i) {
-            return 'area radar-chart-serie' + i;
+            return 'area radar-chart-serie' + i + (d.className ? ' ' + d.className : '');
           })
           .style('stroke', function(d, i) { return cfg.color(i); })
           .style('fill', function(d, i) { return cfg.color(i); })
           .attr('points',function(d) {
-            return d.map(function(p) {
+            return d.axes.map(function(p) {
               return [p.x, p.y].join(',');
             }).join(' ');
           })
@@ -141,8 +149,11 @@ var RadarChart = {
         circleGroups.enter().append('g').classed('circle', 1);
         circleGroups.exit().remove();
 
-        var circle = circleGroups.selectAll('circle').data(function(axis, i) {
-          return axis.map(function(d) { return [d, i]; });
+        circleGroups.attr('class', function(d) {
+          return 'circle ' + (d.className ? ' ' + d.className : '');
+        });
+        var circle = circleGroups.selectAll('circle').data(function(datum, i) {
+          return datum.axes.map(function(d) { return [d, i]; });
         });
 
         circle.enter().append('circle');
