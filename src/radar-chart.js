@@ -3,7 +3,6 @@ var RadarChart = {
     // default config
     var cfg = {
       containerClass: 'radar-chart',
-      radius: 5,
       w: 600,
       h: 600,
       factor: 0.95,
@@ -11,7 +10,11 @@ var RadarChart = {
       levels: 3,
       maxValue: 0,
       radians: 2 * Math.PI,
-      color: d3.scale.category10()
+      color: d3.scale.category10(),
+      axisLine: true,
+      axisText: true,
+      circles: true,
+      radius: 5
     };
 
     function radar(selection) {
@@ -78,37 +81,46 @@ var RadarChart = {
             return 'translate(' + (cfg.w/2-levelFactor) + ', ' + (cfg.h/2-levelFactor) + ')';
           });
 
-        var axis = container.selectAll('.axis').data(allAxis);
+        if(cfg.axisLine || cfg.axisText) {
+          var axis = container.selectAll('.axis').data(allAxis);
 
-        var newAxis = axis.enter().append('g');
-        newAxis.append('line');
-        newAxis.append('text');
+          var newAxis = axis.enter().append('g');
+          if(cfg.axisLine) {
+            newAxis.append('line');
+          }
+          if(cfg.axisText) {
+            newAxis.append('text');
+          }
 
-        axis.exit().remove();
+          axis.exit().remove();
 
-        axis.attr('class', 'axis');
+          axis.attr('class', 'axis');
 
-        axis.select('line')
-            .attr('x1', cfg.w/2)
-            .attr('y1', cfg.h/2)
-            .attr('x2', function(d, i) { return getHorizontalPosition(i, cfg.w / 2, cfg.factor); })
-            .attr('y2', function(d, i) { return getVerticalPosition(i, cfg.h / 2, cfg.factor); });
+          if(cfg.axisLine) {
+            axis.select('line')
+              .attr('x1', cfg.w/2)
+              .attr('y1', cfg.h/2)
+              .attr('x2', function(d, i) { return getHorizontalPosition(i, cfg.w / 2, cfg.factor); })
+              .attr('y2', function(d, i) { return getVerticalPosition(i, cfg.h / 2, cfg.factor); });
+          }
 
-        axis.select('text')
-            .attr('class', function(d, i){
-              var p = getHorizontalPosition(i, 0.5);
+          if(cfg.axisText) {
+            axis.select('text')
+              .attr('class', function(d, i){
+                var p = getHorizontalPosition(i, 0.5);
 
-              return 'legend ' +
-                ((p < 0.4) ? 'left' : ((p > 0.6) ? 'right' : 'middle'));
-            })
-            .attr('dy', function(d, i) {
-              var p = getVerticalPosition(i, 0.5);
-              return ((p < 0.1) ? '1em' : ((p > 0.9) ? '0' : '0.5em'));
-            })
-            .text(function(d) { return d; })
-            .attr('x', function(d, i){ return getHorizontalPosition(i, cfg.w / 2, cfg.factorLegend); })
-            .attr('y', function(d, i){ return getVerticalPosition(i, cfg.h / 2, cfg.factorLegend); });
-
+                return 'legend ' +
+                  ((p < 0.4) ? 'left' : ((p > 0.6) ? 'right' : 'middle'));
+              })
+              .attr('dy', function(d, i) {
+                var p = getVerticalPosition(i, 0.5);
+                return ((p < 0.1) ? '1em' : ((p > 0.9) ? '0' : '0.5em'));
+              })
+              .text(function(d) { return d; })
+              .attr('x', function(d, i){ return getHorizontalPosition(i, cfg.w / 2, cfg.factorLegend); })
+              .attr('y', function(d, i){ return getVerticalPosition(i, cfg.h / 2, cfg.factorLegend); });
+          }
+        }
 
         // content
         data.forEach(function(d){
@@ -143,57 +155,58 @@ var RadarChart = {
             d3.select(this).classed('focused', 0);
           });
 
+        if(cfg.circles && cfg.radius) {
+          var circleGroups = container.selectAll('g.circle').data(data);
 
-        var circleGroups = container.selectAll('g.circle').data(data);
+          circleGroups.enter().append('g').classed('circle', 1);
+          circleGroups.exit().remove();
 
-        circleGroups.enter().append('g').classed('circle', 1);
-        circleGroups.exit().remove();
-
-        circleGroups.attr('class', function(d) {
-          return 'circle ' + (d.className ? ' ' + d.className : '');
-        });
-        var circle = circleGroups.selectAll('circle').data(function(datum, i) {
-          return datum.axes.map(function(d) { return [d, i]; });
-        });
-
-        circle.enter().append('circle');
-        circle.exit().remove();
-
-        var tooltip = container.selectAll('.tooltip').data([1]);
-        tooltip.enter().append('text').attr('class', 'tooltip');
-
-        circle
-          .attr('class', function(d) {
-            return 'radar-chart-serie'+d[1];
-          })
-          .attr('r', cfg.radius)
-          .attr('cx', function(d) {
-            return d[0].x;
-          })
-          .attr('cy', function(d) {
-            return d[0].y;
-          })
-          .style('fill', function(d) { return cfg.color(d[1]); })
-          .on('mouseover', function(d){
-            tooltip
-              .attr('x', d[0].x - 10)
-              .attr('y', d[0].y - 5)
-              .text(d[0].value)
-              .classed('visible', 1);
-
-            container.classed('focus', 1);
-            container.select('.area.radar-chart-serie'+d[1]).classed('focused', 1);
-          })
-          .on('mouseout', function(d){
-            tooltip.classed('visible', 0);
-
-            container.classed('focus', 0);
-            container.select('.area.radar-chart-serie'+d[1]).classed('focused', 0);
+          circleGroups.attr('class', function(d) {
+            return 'circle ' + (d.className ? ' ' + d.className : '');
+          });
+          var circle = circleGroups.selectAll('circle').data(function(datum, i) {
+            return datum.axes.map(function(d) { return [d, i]; });
           });
 
-        // ensure tooltip is upmost layer
-        var tooltipEl = tooltip.node();
-        tooltipEl.parentNode.appendChild(tooltipEl); 
+          circle.enter().append('circle');
+          circle.exit().remove();
+
+          var tooltip = container.selectAll('.tooltip').data([1]);
+          tooltip.enter().append('text').attr('class', 'tooltip');
+
+          circle
+            .attr('class', function(d) {
+              return 'radar-chart-serie'+d[1];
+            })
+            .attr('r', cfg.radius)
+            .attr('cx', function(d) {
+              return d[0].x;
+            })
+            .attr('cy', function(d) {
+              return d[0].y;
+            })
+            .style('fill', function(d) { return cfg.color(d[1]); })
+            .on('mouseover', function(d){
+              tooltip
+                .attr('x', d[0].x - 10)
+                .attr('y', d[0].y - 5)
+                .text(d[0].value)
+                .classed('visible', 1);
+
+              container.classed('focus', 1);
+              container.select('.area.radar-chart-serie'+d[1]).classed('focused', 1);
+            })
+            .on('mouseout', function(d){
+              tooltip.classed('visible', 0);
+
+              container.classed('focus', 0);
+              container.select('.area.radar-chart-serie'+d[1]).classed('focused', 0);
+            });
+
+          // ensure tooltip is upmost layer
+          var tooltipEl = tooltip.node();
+          tooltipEl.parentNode.appendChild(tooltipEl);
+        }
       });
     }
 
