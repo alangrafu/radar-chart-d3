@@ -48,7 +48,7 @@ RadarChart.draw("#chart", d);
  </div>
  
 <div style='width:100%;margin-top:700px;'>
- <h2>Dynamically-generated chart</h2>
+ <h2>Dynamically-generated chart with transitions</h2>
  <a name="dynamic"></a>
  <div id="chart2" style='float:left'></div>
  <button onclick="newRadar();" style='float:left'>Press Me!</button>
@@ -93,8 +93,8 @@ var chart2svg = d3.select("#chart2").append("svg")
   .attr("height", chart2cfg.h);
 
 function newRadar(){
-  var data = [];
-  for(var i=0; i<3; i++){
+  var data = [], layers = Math.random()*3;
+  for(var i=0; i<layers; i++){
     data.push([
            {axis: "strength", value: Math.floor((Math.random()*100)+1)}, 
            {axis: "intelligence", value: Math.floor((Math.random()*100)+1)}, 

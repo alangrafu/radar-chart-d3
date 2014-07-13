@@ -14,7 +14,11 @@ var RadarChart = {
       axisLine: true,
       axisText: true,
       circles: true,
-      radius: 5
+      radius: 5,
+      axisJoin: function(d, i) {
+        return d.className || i;
+      },
+      transitionDuration: 300
     };
 
     function radar(selection) {
@@ -130,22 +134,10 @@ var RadarChart = {
           });
         });
 
-        var polygon = container.selectAll(".area").data(data);
+        var polygon = container.selectAll(".area").data(data, cfg.axisJoin);
 
-        polygon.enter().append('polygon');
-        polygon.exit().remove();
-
-        polygon
-          .attr('class', function(d, i) {
-            return 'area radar-chart-serie' + i + (d.className ? ' ' + d.className : '');
-          })
-          .style('stroke', function(d, i) { return cfg.color(i); })
-          .style('fill', function(d, i) { return cfg.color(i); })
-          .attr('points',function(d) {
-            return d.axes.map(function(p) {
-              return [p.x, p.y].join(',');
-            }).join(' ');
-          })
+        polygon.enter().append('polygon')
+          .classed({area: 1, 'd3-enter': 1})
           .on('mouseover', function (d){
             container.classed('focus', 1);
             d3.select(this).classed('focused', 1);
@@ -155,37 +147,64 @@ var RadarChart = {
             d3.select(this).classed('focused', 0);
           });
 
+        polygon.exit()
+          .classed('d3-exit', 1) // trigger css transition
+          .transition().duration(cfg.transitionDuration)
+            .remove();
+
+        polygon
+          .each(function(d, i) {
+            var classed = {'d3-exit': 0}; // if exiting element is being reused
+            classed['radar-chart-serie' + i] = 1;
+            if(d.className) {
+              classed[d.className] = 1;
+            }
+            d3.select(this).classed(classed);
+          })
+          // styles should only be transitioned with css
+          .style('stroke', function(d, i) { return cfg.color(i); })
+          .style('fill', function(d, i) { return cfg.color(i); })
+          .transition().duration(cfg.transitionDuration)
+            // svg attrs with js
+            .attr('points',function(d) {
+              return d.axes.map(function(p) {
+                return [p.x, p.y].join(',');
+              }).join(' ');
+            })
+            .each('start', function() {
+              d3.select(this).classed('d3-enter', 0); // trigger css transition
+            });
+
         if(cfg.circles && cfg.radius) {
-          var circleGroups = container.selectAll('g.circle').data(data);
-
-          circleGroups.enter().append('g').classed('circle', 1);
-          circleGroups.exit().remove();
-
-          circleGroups.attr('class', function(d) {
-            return 'circle ' + (d.className ? ' ' + d.className : '');
-          });
-          var circle = circleGroups.selectAll('circle').data(function(datum, i) {
-            return datum.axes.map(function(d) { return [d, i]; });
-          });
-
-          circle.enter().append('circle');
-          circle.exit().remove();
-
           var tooltip = container.selectAll('.tooltip').data([1]);
           tooltip.enter().append('text').attr('class', 'tooltip');
 
-          circle
-            .attr('class', function(d) {
-              return 'radar-chart-serie'+d[1];
+          var circleGroups = container.selectAll('g.circle-group').data(data, cfg.axisJoin);
+
+          circleGroups.enter().append('g').classed({'circle-group': 1, 'd3-enter': 1});
+          circleGroups.exit()
+            .classed('d3-exit', 1) // trigger css transition
+            .transition().duration(cfg.transitionDuration).remove();
+
+          circleGroups
+            .each(function(d) {
+              var classed = {'d3-exit': 0}; // if exiting element is being reused
+              if(d.className) {
+                classed[d.className] = 1;
+              }
+              d3.select(this).classed(classed);
             })
-            .attr('r', cfg.radius)
-            .attr('cx', function(d) {
-              return d[0].x;
-            })
-            .attr('cy', function(d) {
-              return d[0].y;
-            })
-            .style('fill', function(d) { return cfg.color(d[1]); })
+            .transition().duration(cfg.transitionDuration)
+              .each('start', function() {
+                d3.select(this).classed('d3-enter', 0); // trigger css transition
+              });
+
+          var circle = circleGroups.selectAll('.circle').data(function(datum, i) {
+            return datum.axes.map(function(d) { return [d, i]; });
+          });
+
+          circle.enter().append('circle')
+            .classed({circle: 1, 'd3-enter': 1})
             .on('mouseover', function(d){
               tooltip
                 .attr('x', d[0].x - 10)
@@ -202,6 +221,31 @@ var RadarChart = {
               container.classed('focus', 0);
               container.select('.area.radar-chart-serie'+d[1]).classed('focused', 0);
             });
+
+          circle.exit()
+            .classed('d3-exit', 1) // trigger css transition
+            .transition().duration(cfg.transitionDuration).remove();
+
+          circle
+            .each(function(d) {
+              var classed = {'d3-exit': 0}; // if exit element reused
+              classed['radar-chart-serie'+d[1]] = 1;
+              d3.select(this).classed(classed);
+            })
+            // styles should only be transitioned with css
+            .style('fill', function(d) { return cfg.color(d[1]); })
+            .transition().duration(cfg.transitionDuration)
+              // svg attrs with js
+              .attr('r', cfg.radius)
+              .attr('cx', function(d) {
+                return d[0].x;
+              })
+              .attr('cy', function(d) {
+                return d[0].y;
+              })
+              .each('start', function() {
+                d3.select(this).classed('d3-enter', 0); // trigger css transition
+              });
 
           // ensure tooltip is upmost layer
           var tooltipEl = tooltip.node();
