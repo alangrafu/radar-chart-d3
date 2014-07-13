@@ -1,185 +1,118 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-      <link rel="logo" type="image/png" href="demo.png" />
-      <title>Demo Radar chart D3</title>
-      <style>
-      body{font-family: sans-serif}
-      </style>
-      <link rel="stylesheet" href="../src/radar-chart.css">
-</head>
-<body>
- <div style='width:100%;display:block;'>
-  <h2>Example of radar chart</h2>
-  <h4><a href='https://github.com/alangrafu/radar-chart-d3'>https://github.com/alangrafu/radar-chart-d3</a></h4>
-  <div id="chart" style='float:left'></div>
-  <div style='float:left'>
-   Code:
-   <pre>
-d = [
-      {className: 'youth', axes:[
-           {axis: "strength", value: 13}, 
-           {axis: "intelligence", value: 1}, 
-           {axis: "charisma", value: 8},  
-           {axis: "dexterity", value: 4},  
-           {axis: "luck", value: 9}
-          ]},
-      {className: 'midAge', axes:[
-           {axis: "strength", value: 3}, 
-           {axis: "intelligence", value: 15}, 
-           {axis: "charisma", value: 4}, 
-           {axis: "dexterity", value: 1},  
-           {axis: "luck", value: 15}
-          ]},
-      {className: 'old', axes:[
-           {axis: "strength", value: 5}, 
-           {axis: "intelligence", value: 1}, 
-           {axis: "charisma", value: 16}, 
-           {axis: "dexterity", value: 10},  
-           {axis: "luck", value: 5}
-     ]}
-];
 
-RadarChart.draw("#chart", d);
+<meta charset="utf-8">
+<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
+<link rel="stylesheet" href="../src/radar-chart.css">
 
-   </pre>
-  </div>
- </div>
- 
-<div style='width:100%;margin-top:700px;'>
- <h2>Dynamically-generated chart with transitions</h2>
- <a name="dynamic"></a>
- <div id="chart2" style='float:left'></div>
- <button onclick="newRadar();" style='float:left'>Press Me!</button>
-</div>
-<script src="http://d3js.org/d3.v3.min.js"></script>
+<style>
+body {
+  padding: 20px;
+}
+</style>
+
+<style>
+.radar-chart .area {
+  fill-opacity: 0.7;
+}
+.radar-chart.focus .area {
+  fill-opacity: 0.3;
+}
+.radar-chart.focus .area.focused {
+  fill-opacity: 0.9;
+}
+.area.germany, .germany .circle {
+  fill: #FFD700;
+  stroke: none;
+}
+.area.argentina, .argentina .circle {
+  fill: #ADD8E6;
+  stroke: none;
+}
+</style>
+
+<script src="http://d3js.org/d3.v3.js"></script>
 <script src="../src/radar-chart.js"></script>
+
 <script>
-var d = [
-      {className: 'youth', axes:[
-           {axis: "strength", value: 13}, 
-           {axis: "intelligence", value: 1}, 
-           {axis: "charisma", value: 8},  
-           {axis: "dexterity", value: 4},  
-           {axis: "luck", value: 9}
-          ]},
-      {className: 'midAge', axes:[
-           {axis: "strength", value: 3}, 
-           {axis: "intelligence", value: 15}, 
-           {axis: "charisma", value: 4}, 
-           {axis: "dexterity", value: 1},  
-           {axis: "luck", value: 15}
-          ]},
-      {className: 'old', axes:[
-           {axis: "strength", value: 5}, 
-           {axis: "intelligence", value: 1}, 
-           {axis: "charisma", value: 16}, 
-           {axis: "dexterity", value: 10},  
-           {axis: "luck", value: 5}
-      ]}
-    ];
+RadarChart.defaultConfig.color = function() {};
+RadarChart.defaultConfig.radius = 3;
+</script>
 
+<h1>Radar Chart</h1>
+<p>A reusable radar chart implementation in D3.js</p>
 
-RadarChart.draw("#chart", d);
-
-
-//This function generates a new array with 3 objects every time. The values for each axis are randomized
-//In order to re-generate the radar chart, you jsut need to run RadarChart.draw("#chart2", data) as usual.
-var chart2 = RadarChart.chart();
-var chart2cfg = chart2.config();
-var chart2svg = d3.select("#chart2").append("svg")
-  .attr("width", chart2cfg.w)
-  .attr("height", chart2cfg.h);
-
-function newRadar(){
-  var data = [], layers = Math.random()*3;
-  for(var i=0; i<layers; i++){
-    data.push([
-           {axis: "strength", value: Math.floor((Math.random()*100)+1)}, 
-           {axis: "intelligence", value: Math.floor((Math.random()*100)+1)}, 
-           {axis: "charisma", value: Math.floor((Math.random()*100)+1)}, 
-           {axis: "dexterity", value: Math.floor((Math.random()*100)+1)},  
-           {axis: "luck", value: Math.floor((Math.random()*100)+1)}
-          ]);
+<script>
+var data = [
+  {
+    className: 'germany', // optional can be used for styling
+    axes: [
+      {axis: "strength", value: 13}, 
+      {axis: "intelligence", value: 6}, 
+      {axis: "charisma", value: 5},  
+      {axis: "dexterity", value: 9},  
+      {axis: "luck", value: 2}
+    ]
+  },
+  {
+    className: 'argentina',
+    axes: [
+      {axis: "strength", value: 6}, 
+      {axis: "intelligence", value: 7}, 
+      {axis: "charisma", value: 10},  
+      {axis: "dexterity", value: 13},  
+      {axis: "luck", value: 9}
+    ]
   }
-  chart2svg
-    .datum(data)
-    .call(chart2);
+];
+function randomDataset() {
+  return data.map(function(d) {
+    return {
+      className: d.className,
+      axes: d.axes.map(function(axis) {
+        return {axis: axis.axis, value: Math.ceil(Math.random() * 10)};
+      })
+    };
+  });
 }
-newRadar();
 </script>
-<div style='width:100%;margin-top:700px;'>
- <a name="colors"></a>
- <h2>Radar chart using random colors (reload to see different colors)</h2>
- <div id="chart3" style='float:left'></div>
- <div style='float:left'>
-   Code:
-   <pre>
-    <code>
-d = [
-          [
-           {axis: "var1", value: 31}, 
-           {axis: "var2", value: 31}, 
-           {axis: "var3", value: 23}, 
-           {axis: "var4", value: 2}, 
-           {axis: "var5", value: 18}, 
-           {axis: "var6", value: 3}, 
-           {axis: "var7", value: 43}, 
-          ],[
-           {axis: "var1", value: 29}, 
-           {axis: "var2", value: 3}, 
-           {axis: "var3", value: 3}, 
-           {axis: "var4", value: 22}, 
-           {axis: "var5", value: 38}, 
-           {axis: "var6", value: 13}, 
-           {axis: "var7", value: 3},
-          ]
-        ];
 
-var mycfg = {
-  color: function(){
-  c = ['red', 'yellow', 'pink', 'green', 'blue', 'olive', 'aqua', 'cadetblue', 'crimson'];
-  m = c.length - 1;
-  x = parseInt(Math.random()*100);
-  return c[x%m]; //Get a random color
-}
-}
-RadarChart.draw("#chart3", d, mycfg);
-  </code>
- </pre>
-</div>
-</div>
+<h2>Reusable D3 API</h2>
 <script>
-d = [
-          [
-           {axis: "var1", value: 31}, 
-           {axis: "var2", value: 31}, 
-           {axis: "var3", value: 23}, 
-           {axis: "var4", value: 2}, 
-           {axis: "var5", value: 18}, 
-           {axis: "var6", value: 3}, 
-           {axis: "var7", value: 43}, 
-          ],[
-           {axis: "var1", value: 29}, 
-           {axis: "var2", value: 3}, 
-           {axis: "var3", value: 3}, 
-           {axis: "var4", value: 22}, 
-           {axis: "var5", value: 38}, 
-           {axis: "var6", value: 13}, 
-           {axis: "var7", value: 3},
-          ]
-        ];
+var chart = RadarChart.chart();
+var cfg = chart.config(); // retrieve default config
+var svg = d3.select('body').append('svg')
+  .attr('width', cfg.w)
+  .attr('height', cfg.h + cfg.h / 4);
+svg.append('g').classed('single', 1).datum(randomDataset()).call(chart);
 
-var mycfg = {
-  color: function(){
-  c = ['red', 'yellow', 'pink', 'green', 'blue', 'olive', 'aqua', 'cadetblue', 'crimson'];
-  m = c.length - 1;
-  x = parseInt(Math.random()*100);
-  return c[x%m]; //Get a random color
+// many radars
+chart.config({w: cfg.w / 4, h: cfg.h / 4, axisText: false, levels: 0, circles: false});
+cfg = chart.config();
+function render() {
+  var game = svg.selectAll('g.game').data(
+    [
+      randomDataset(),
+      randomDataset(),
+      randomDataset(),
+      randomDataset()
+    ]
+  );
+  game.enter().append('g').classed('game', 1);
+  game
+    .attr('transform', function(d, i) { return 'translate('+(i * cfg.w)+','+ (cfg.h * 4) +')'; })
+    .call(chart);
+
+  setTimeout(render, 1000);
 }
-}
-RadarChart.draw("#chart3", d, mycfg);
+render();
 </script>
-</body>
-</html>
+
+<script>
+</script>
+
+
+<h2>Simple single chart drawing</h2>
+<div class="chart-container"></div>
+<script>
+RadarChart.draw(".chart-container", data);
+</script>
