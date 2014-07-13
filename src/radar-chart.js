@@ -1,25 +1,26 @@
 var RadarChart = {
+  defaultConfig: {
+    containerClass: 'radar-chart',
+    w: 600,
+    h: 600,
+    factor: 0.95,
+    factorLegend: 1,
+    levels: 3,
+    maxValue: 0,
+    radians: 2 * Math.PI,
+    color: d3.scale.category10(),
+    axisLine: true,
+    axisText: true,
+    circles: true,
+    radius: 5,
+    axisJoin: function(d, i) {
+      return d.className || i;
+    },
+    transitionDuration: 300
+  },
   chart: function() {
     // default config
-    var cfg = {
-      containerClass: 'radar-chart',
-      w: 600,
-      h: 600,
-      factor: 0.95,
-      factorLegend: 1,
-      levels: 3,
-      maxValue: 0,
-      radians: 2 * Math.PI,
-      color: d3.scale.category10(),
-      axisLine: true,
-      axisText: true,
-      circles: true,
-      radius: 5,
-      axisJoin: function(d, i) {
-        return d.className || i;
-      },
-      transitionDuration: 300
-    };
+    var cfg = Object.create(RadarChart.defaultConfig);
 
     function radar(selection) {
       selection.each(function(data) {
