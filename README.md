@@ -6,7 +6,7 @@ A reusable radar chart implementation in D3.js. Styleable, configurable and tran
 ## Usage
 
 ### Install
-`bower install git@github.com:tpreusse/radar-chart-d3.git --save`
+`bower install git@github.com:alangrafu/radar-chart-d3.git --save`
 
 ### Data structure
 ```
