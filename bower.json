@@ -1,7 +1,7 @@
 {
-  "name": "alangrafu/radar-chart-d3",
-  "version": "1.0.0",
-  "main": null,
+  "name": "radar-chart-d3",
+  "version": "1.2.0",
+  "main": ["src/radar-chart.js", "src/radar-chart.css"],
   "description": "Radar chart based on D3",
   "license": "Apache",
   "ignore": [
