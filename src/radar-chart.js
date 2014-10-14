@@ -78,8 +78,8 @@ var RadarChart = {
         levelLine.enter().append('line');
         levelLine.exit().remove();
 
-        if (cfg.levelTick)
-        levelLine
+        if (cfg.levelTick){
+          levelLine
           .attr('class', 'level')
           .attr('x1', function(levelFactor, i){
             if (radius == levelFactor) {
@@ -112,8 +112,9 @@ var RadarChart = {
           .attr('transform', function(levelFactor) {
             return 'translate(' + (cfg.w/2-levelFactor) + ', ' + (cfg.h/2-levelFactor) + ')';
           });
-        else
-        levelLine
+        }
+        else{
+          levelLine
           .attr('class', 'level')
           .attr('x1', function(levelFactor, i){ return getHorizontalPosition(i, levelFactor); })
           .attr('y1', function(levelFactor, i){ return getVerticalPosition(i, levelFactor); })
@@ -122,7 +123,7 @@ var RadarChart = {
           .attr('transform', function(levelFactor) {
             return 'translate(' + (cfg.w/2-levelFactor) + ', ' + (cfg.h/2-levelFactor) + ')';
           });
-
+        }
         if(cfg.axisLine || cfg.axisText) {
           var axis = container.selectAll('.axis').data(allAxis);
 

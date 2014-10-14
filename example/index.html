@@ -112,7 +112,9 @@ render();
 
 
 <h2>Simple single chart drawing</h2>
+<h3>No lines, only ticks</h3>
 <div class="chart-container"></div>
 <script>
+RadarChart.defaultConfig.levelTick = true;
 RadarChart.draw(".chart-container", data);
 </script>
