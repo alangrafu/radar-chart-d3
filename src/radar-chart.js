@@ -6,6 +6,8 @@ var RadarChart = {
     factor: 0.95,
     factorLegend: 1,
     levels: 3,
+    levelTick: false,
+    TickLength: 10,
     maxValue: 0,
     radians: 2 * Math.PI,
     color: d3.scale.category10(),
@@ -76,6 +78,41 @@ var RadarChart = {
         levelLine.enter().append('line');
         levelLine.exit().remove();
 
+        if (cfg.levelTick)
+        levelLine
+          .attr('class', 'level')
+          .attr('x1', function(levelFactor, i){
+            if (radius == levelFactor) {
+              return getHorizontalPosition(i, levelFactor);
+            } else {
+              return getHorizontalPosition(i, levelFactor) + (cfg.TickLength / 2) * Math.cos(i * cfg.radians / total);
+            }
+          })
+          .attr('y1', function(levelFactor, i){
+            if (radius == levelFactor) {
+              return getVerticalPosition(i, levelFactor);
+            } else {
+              return getVerticalPosition(i, levelFactor) - (cfg.TickLength / 2) * Math.sin(i * cfg.radians / total);
+            }
+          })
+          .attr('x2', function(levelFactor, i){
+            if (radius == levelFactor) {
+              return getHorizontalPosition(i+1, levelFactor);
+            } else {
+              return getHorizontalPosition(i, levelFactor) - (cfg.TickLength / 2) * Math.cos(i * cfg.radians / total);
+            }
+          })
+          .attr('y2', function(levelFactor, i){
+            if (radius == levelFactor) {
+              return getVerticalPosition(i+1, levelFactor);
+            } else {
+              return getVerticalPosition(i, levelFactor) + (cfg.TickLength / 2) * Math.sin(i * cfg.radians / total);
+            }
+          })
+          .attr('transform', function(levelFactor) {
+            return 'translate(' + (cfg.w/2-levelFactor) + ', ' + (cfg.h/2-levelFactor) + ')';
+          });
+        else
         levelLine
           .attr('class', 'level')
           .attr('x1', function(levelFactor, i){ return getHorizontalPosition(i, levelFactor); })
