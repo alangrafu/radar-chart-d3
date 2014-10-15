@@ -18,7 +18,10 @@ var RadarChart = {
     axisJoin: function(d, i) {
       return d.className || i;
     },
-    transitionDuration: 300
+    transitionDuration: 300,
+    tooltip: function(d) {
+      return d[0].value;
+    }
   },
   chart: function() {
     // default config
@@ -248,7 +251,7 @@ var RadarChart = {
               tooltip
                 .attr('x', d[0].x - 10)
                 .attr('y', d[0].y - 5)
-                .text(d[0].value)
+                .text(cfg.tooltip(d))
                 .classed('visible', 1);
 
               container.classed('focus', 1);
