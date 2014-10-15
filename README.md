@@ -110,6 +110,9 @@ chart.config({
   axisJoin: function(d, i) {
     return d.className || i;
   },
+  tooltip: function(d) {
+    return d[0].value;
+  },
   transitionDuration: 300
 });
 ```

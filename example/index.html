@@ -78,8 +78,9 @@ function randomDataset() {
 
 <h2>Reusable D3 API</h2>
 <script>
-var chart = RadarChart.chart();
+var chart = RadarChart.chart().config({tooltip: function(d) { return d[0].axis + ': ' + d[0].value; }});
 var cfg = chart.config(); // retrieve default config
+
 var svg = d3.select('body').append('svg')
   .attr('width', cfg.w)
   .attr('height', cfg.h + cfg.h / 4);
