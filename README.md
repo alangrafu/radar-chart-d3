@@ -14,11 +14,11 @@ var data = [
   {
     className: 'germany', // optional can be used for styling
     axes: [
-      {axis: "strength", value: 13}, 
+      {axis: "strength", value: 13, yOffset: 10}, 
       {axis: "intelligence", value: 6}, 
       {axis: "charisma", value: 5},  
       {axis: "dexterity", value: 9},  
-      {axis: "luck", value: 2}
+      {axis: "luck", value: 2, xOffset: -20}
     ]
   },
   {
@@ -33,6 +33,8 @@ var data = [
   }
 ];
 ```
+
+`xOffset` and `yOffset` allows a developer to change the position of a specific label. It is important to add them in **the first** group of axes.
 
 ### Simple single chart drawing
 ```html
