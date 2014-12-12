@@ -40,7 +40,7 @@ var RadarChart = {
           return d3.max(d.axes, function(o){ return o.value; });
         }));
 
-        var allAxis = data[0].axes.map(function(i, j){ return i.axis; });
+        var allAxis = data[0].axes.map(function(i, j){ return {name: i.axis, xOffset: (i.xOffset)?i.xOffset:0, yOffset: (i.yOffset)?i.yOffset:0}; });
         var total = allAxis.length;
         var radius = cfg.factor * Math.min(cfg.w / 2, cfg.h / 2);
 
@@ -159,9 +159,9 @@ var RadarChart = {
                 var p = getVerticalPosition(i, 0.5);
                 return ((p < 0.1) ? '1em' : ((p > 0.9) ? '0' : '0.5em'));
               })
-              .text(function(d) { return d; })
-              .attr('x', function(d, i){ return getHorizontalPosition(i, cfg.w / 2, cfg.factorLegend); })
-              .attr('y', function(d, i){ return getVerticalPosition(i, cfg.h / 2, cfg.factorLegend); });
+              .text(function(d) { return d.name; })
+              .attr('x', function(d, i){ return d.xOffset+ getHorizontalPosition(i, cfg.w/2, cfg.factorLegend); })
+              .attr('y', function(d, i){ return d.yOffset+ getVerticalPosition(i, cfg.h/2, cfg.factorLegend); });
           }
         }
 
