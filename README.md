@@ -34,7 +34,7 @@ var data = [
 ];
 ```
 
-`xOffset` and `yOffset` allows a developer to change the position of a specific label. It is important to add them in **the first** group of axes.
+`xOffset` and `yOffset` are optional values that allows a developer to change the position of a specific label. It is important to add them in **the first** group of axes.
 
 ### Simple single chart drawing
 ```html
