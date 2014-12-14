@@ -51,7 +51,7 @@ var svg = d3.select('body').append('svg')
   .attr('width', 600)
   .attr('height', 800);
 
-// darw one
+// draw one
 svg.append('g').classed('focus', 1).datum(data).call(chart);
 
 // draw many radars
