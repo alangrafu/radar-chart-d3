@@ -35,10 +35,23 @@ var RadarChart = {
           }
           return datum;
         });
-
-        var maxValue = Math.max(cfg.maxValue, d3.max(data, function(d) { 
-          return d3.max(d.axes, function(o){ return o.value; });
-        }));
+        if (Object.prototype.toString.call(cfg.maxValue) == '[object Object]') {
+          var maxValue = {};
+          for(var axis in cfg.maxValue) {
+            if (cfg.maxValue.hasOwnProperty(axis)) {
+              maxValue[axis] = Math.max(cfg.maxValue[axis], d3.max(data, function(d) {
+                return d3.max(d.axes, function(o){
+                  var result = o.axis == axis? o.value : 0;
+                  return result;
+                })
+              }));
+            }
+          }
+        } else {
+          var maxValue = Math.max(cfg.maxValue, d3.max(data, function(d) { 
+            return d3.max(d.axes, function(o){ return o.value; });
+          }));
+        }
 
         var allAxis = data[0].axes.map(function(i, j){ return {name: i.axis, xOffset: (i.xOffset)?i.xOffset:0, yOffset: (i.yOffset)?i.yOffset:0}; });
         var total = allAxis.length;
@@ -168,8 +181,13 @@ var RadarChart = {
         // content
         data.forEach(function(d){
           d.axes.forEach(function(axis, i) {
-            axis.x = getHorizontalPosition(i, cfg.w/2, (parseFloat(Math.max(axis.value, 0))/maxValue)*cfg.factor);
-            axis.y = getVerticalPosition(i, cfg.h/2, (parseFloat(Math.max(axis.value, 0))/maxValue)*cfg.factor);
+            if (Object.prototype.toString.call(cfg.maxValue) == '[object Object]') {
+              axis.x = getHorizontalPosition(i, cfg.w/2, (parseFloat(Math.max(axis.value, 0))/maxValue[axis.axis])*cfg.factor);
+              axis.y = getVerticalPosition(i, cfg.h/2, (parseFloat(Math.max(axis.value, 0))/maxValue[axis.axis])*cfg.factor);
+            } else {
+              axis.x = getHorizontalPosition(i, cfg.w/2, (parseFloat(Math.max(axis.value, 0))/maxValue)*cfg.factor);
+              axis.y = getVerticalPosition(i, cfg.h/2, (parseFloat(Math.max(axis.value, 0))/maxValue)*cfg.factor);
+            }
           });
         });
 
