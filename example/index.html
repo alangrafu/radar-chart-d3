@@ -1,120 +1,119 @@
 <!DOCTYPE html>
-
+<html>
 <meta charset="utf-8">
 <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
 <link rel="stylesheet" href="../src/radar-chart.css">
+<head>
+  <style>
+    body {
+      padding: 20px;
+    }
+    .radar-chart .area {
+      fill-opacity: 0.7;
+    }
+    .radar-chart.focus .area {
+      fill-opacity: 0.3;
+    }
+    .radar-chart.focus .area.focused {
+      fill-opacity: 0.9;
+    }
+    .area.germany, .germany .circle {
+      fill: #FFD700;
+      stroke: none;
+    }
+    .area.argentina, .argentina .circle {
+      fill: #ADD8E6;
+      stroke: none;
+    }
+  </style>
 
-<style>
-body {
-  padding: 20px;
-}
-</style>
+  <script type="text/javascript" src="http://d3js.org/d3.v3.js"></script>
+  <script type="text/javascript" src="../src/radar-chart.js"></script>
 
-<style>
-.radar-chart .area {
-  fill-opacity: 0.7;
-}
-.radar-chart.focus .area {
-  fill-opacity: 0.3;
-}
-.radar-chart.focus .area.focused {
-  fill-opacity: 0.9;
-}
-.area.germany, .germany .circle {
-  fill: #FFD700;
-  stroke: none;
-}
-.area.argentina, .argentina .circle {
-  fill: #ADD8E6;
-  stroke: none;
-}
-</style>
+  <script type="text/javascript">
+    RadarChart.defaultConfig.color = function() {};
+    RadarChart.defaultConfig.radius = 3;
+  </script>
 
-<script src="http://d3js.org/d3.v3.js"></script>
-<script src="../src/radar-chart.js"></script>
+  <script type="text/javascript">
+    var data = [
+      {
+        className: 'germany', // optional can be used for styling
+        axes: [
+          {axis: "strength", value: 13}, 
+          {axis: "intelligence", value: 6}, 
+          {axis: "charisma", value: 5},  
+          {axis: "dexterity", value: 9},  
+          {axis: "luck", value: 2}
+        ]
+      },
+      {
+        className: 'argentina',
+        axes: [
+          {axis: "strength", value: 6}, 
+          {axis: "intelligence", value: 7}, 
+          {axis: "charisma", value: 10},  
+          {axis: "dexterity", value: 13},  
+          {axis: "luck", value: 9}
+        ]
+      }
+    ];
+    function randomDataset() {
+      return data.map(function(d) {
+        return {
+          className: d.className,
+          axes: d.axes.map(function(axis) {
+            return {axis: axis.axis, value: Math.ceil(Math.random() * 10)};
+          })
+        };
+      });
+    }
+  </script>
+</head>
+<body>
+  <h1>Radar Chart</h1>
+  <p>A reusable radar chart implementation in D3.js</p>
 
-<script>
-RadarChart.defaultConfig.color = function() {};
-RadarChart.defaultConfig.radius = 3;
-</script>
+  <h2>Reusable D3 API</h2>
 
-<h1>Radar Chart</h1>
-<p>A reusable radar chart implementation in D3.js</p>
+  <script type="text/javascript">
+  var chart = RadarChart.chart();
+  var cfg = chart.config(); // retrieve default config
+  var svg = d3.select('body').append('svg')
+    .attr('width', cfg.w)
+    .attr('height', cfg.h + cfg.h / 4);
+  svg.append('g').classed('single', 1).datum(randomDataset()).call(chart);
 
-<script>
-var data = [
-  {
-    className: 'germany', // optional can be used for styling
-    axes: [
-      {axis: "strength", value: 13}, 
-      {axis: "intelligence", value: 6}, 
-      {axis: "charisma", value: 5},  
-      {axis: "dexterity", value: 9},  
-      {axis: "luck", value: 2}
-    ]
-  },
-  {
-    className: 'argentina',
-    axes: [
-      {axis: "strength", value: 6}, 
-      {axis: "intelligence", value: 7}, 
-      {axis: "charisma", value: 10},  
-      {axis: "dexterity", value: 13},  
-      {axis: "luck", value: 9}
-    ]
+  // many radars
+  chart.config({w: cfg.w / 4, h: cfg.h / 4, axisText: false, levels: 0, circles: false});
+  cfg = chart.config();
+  function render() {
+    var game = svg.selectAll('g.game').data(
+      [
+        randomDataset(),
+        randomDataset(),
+        randomDataset(),
+        randomDataset()
+      ]
+    );
+    game.enter().append('g').classed('game', 1);
+    game
+      .attr('transform', function(d, i) { return 'translate('+(i * cfg.w)+','+ (cfg.h * 4) +')'; })
+      .call(chart);
+
+    setTimeout(render, 1000);
   }
-];
-function randomDataset() {
-  return data.map(function(d) {
-    return {
-      className: d.className,
-      axes: d.axes.map(function(axis) {
-        return {axis: axis.axis, value: Math.ceil(Math.random() * 10)};
-      })
-    };
-  });
-}
-</script>
-
-<h2>Reusable D3 API</h2>
-<script>
-var chart = RadarChart.chart();
-var cfg = chart.config(); // retrieve default config
-var svg = d3.select('body').append('svg')
-  .attr('width', cfg.w)
-  .attr('height', cfg.h + cfg.h / 4);
-svg.append('g').classed('single', 1).datum(randomDataset()).call(chart);
-
-// many radars
-chart.config({w: cfg.w / 4, h: cfg.h / 4, axisText: false, levels: 0, circles: false});
-cfg = chart.config();
-function render() {
-  var game = svg.selectAll('g.game').data(
-    [
-      randomDataset(),
-      randomDataset(),
-      randomDataset(),
-      randomDataset()
-    ]
-  );
-  game.enter().append('g').classed('game', 1);
-  game
-    .attr('transform', function(d, i) { return 'translate('+(i * cfg.w)+','+ (cfg.h * 4) +')'; })
-    .call(chart);
-
-  setTimeout(render, 1000);
-}
-render();
-</script>
-
-<script>
-</script>
+  render();
+  </script>
 
 
-<h2>Simple single chart drawing</h2>
-<h3>No lines, only ticks</h3>
-<div class="chart-container"></div>
-<script>
-RadarChart.defaultConfig.levelTick = true;
-RadarChart.draw(".chart-container", data);
-</script>
+  <h2>Simple single chart drawing</h2>
+  <h3>No lines, only ticks</h3>
+  <div class="chart-container"></div>
+  <script type="text/javascript">
+    RadarChart.defaultConfig.levelTick = true;
+    RadarChart.draw(".chart-container", data);
+  </script>
+
+</body>
+</html>
