@@ -43,6 +43,7 @@ var RadarChart = {
         var allAxis = data[0].axes.map(function(i, j){ return {name: i.axis, xOffset: (i.xOffset)?i.xOffset:0, yOffset: (i.yOffset)?i.yOffset:0}; });
         var total = allAxis.length;
         var radius = cfg.factor * Math.min(cfg.w / 2, cfg.h / 2);
+        var radius2 = Math.min(cfg.w / 2, cfg.h / 2);
 
         container.classed(cfg.containerClass, 1);
 
@@ -143,8 +144,8 @@ var RadarChart = {
             axis.select('line')
               .attr('x1', cfg.w/2)
               .attr('y1', cfg.h/2)
-              .attr('x2', function(d, i) { return getHorizontalPosition(i, cfg.w / 2, cfg.factor); })
-              .attr('y2', function(d, i) { return getVerticalPosition(i, cfg.h / 2, cfg.factor); });
+              .attr('x2', function(d, i) { return (cfg.w/2-radius2)+getHorizontalPosition(i, radius2, cfg.factor); })
+              .attr('y2', function(d, i) { return (cfg.h/2-radius2)+getVerticalPosition(i, radius2, cfg.factor); });
           }
 
           if(cfg.axisText) {
@@ -160,16 +161,16 @@ var RadarChart = {
                 return ((p < 0.1) ? '1em' : ((p > 0.9) ? '0' : '0.5em'));
               })
               .text(function(d) { return d.name; })
-              .attr('x', function(d, i){ return d.xOffset+ getHorizontalPosition(i, cfg.w/2, cfg.factorLegend); })
-              .attr('y', function(d, i){ return d.yOffset+ getVerticalPosition(i, cfg.h/2, cfg.factorLegend); });
+              .attr('x', function(d, i){ return d.xOffset+ (cfg.w/2-radius2)+getHorizontalPosition(i, radius2, cfg.factorLegend); })
+              .attr('y', function(d, i){ return d.yOffset+ (cfg.h/2-radius2)+getVerticalPosition(i, radius2, cfg.factorLegend); });
           }
         }
 
         // content
         data.forEach(function(d){
           d.axes.forEach(function(axis, i) {
-            axis.x = getHorizontalPosition(i, cfg.w/2, (parseFloat(Math.max(axis.value, 0))/maxValue)*cfg.factor);
-            axis.y = getVerticalPosition(i, cfg.h/2, (parseFloat(Math.max(axis.value, 0))/maxValue)*cfg.factor);
+            axis.x = (cfg.w/2-radius2)+getHorizontalPosition(i, radius2, (parseFloat(Math.max(axis.value, 0))/maxValue)*cfg.factor);
+            axis.y = (cfg.h/2-radius2)+getVerticalPosition(i, radius2, (parseFloat(Math.max(axis.value, 0))/maxValue)*cfg.factor);
           });
         });
 
