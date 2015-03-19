@@ -117,6 +117,10 @@ chart.config({
 ```
 
 ## Example
+###CSV2Radar
+
+Display a csv file as a radar chart at [http://alangrafu.github.io/radar-chart-d3/csv2radar.html](http://alangrafu.github.io/radar-chart-d3/csv2radar.html).
+
 
 [![Example](https://rawgit.com/tpreusse/radar-chart-d3/master/example/demo.svg)](http://bl.ocks.org/tpreusse/2bc99d74a461b8c0acb1)
 http://bl.ocks.org/tpreusse/2bc99d74a461b8c0acb1
