@@ -26,7 +26,7 @@ var RadarChart = {
   chart: function() {
     // default config
     var cfg = Object.create(RadarChart.defaultConfig);
-    var toolip;
+    var tooltip;
     function setTooltip(msg){
       if(msg == false){
         tooltip.classed("visible", 0);
