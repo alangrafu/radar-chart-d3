@@ -212,7 +212,6 @@ var RadarChart = {
             d3.event.stopPropagation();
             container.classed('focus', 1);
             d3.select(this).classed('focused', 1);
-            console.log(dd);
             setTooltip(dd.className);
           })
           .on('mouseout', function(){
