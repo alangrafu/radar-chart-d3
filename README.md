@@ -112,6 +112,12 @@ chart.config({
   axisJoin: function(d, i) {
     return d.className || i;
   },
+  tooltipFormatValue: function(d) {
+    return d;
+  },
+  tooltipFormatClass: function(d) {
+    return d;
+  },
   transitionDuration: 300
 });
 ```
