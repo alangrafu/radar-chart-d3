@@ -21,6 +21,12 @@ var RadarChart = {
     axisJoin: function(d, i) {
       return d.className || i;
     },
+    tooltipFormatValue: function(d) {
+      return d;
+    },
+    tooltipFormatClass: function(d) {
+      return d;
+    },
     transitionDuration: 300
   },
   chart: function() {
@@ -216,7 +222,7 @@ var RadarChart = {
             d3.event.stopPropagation();
             container.classed('focus', 1);
             d3.select(this).classed('focused', 1);
-            setTooltip(tooltip, dd.className);
+            setTooltip(tooltip, cfg.tooltipFormatClass(dd.className));
           })
           .on('mouseout', function(){
             d3.event.stopPropagation();
@@ -283,7 +289,7 @@ var RadarChart = {
             .classed({circle: 1, 'd3-enter': 1})
             .on('mouseover', function(dd){
               d3.event.stopPropagation();
-              setTooltip(tooltip, dd[0].value);
+              setTooltip(tooltip, cfg.tooltipFormatValue(dd[0].value));
               //container.classed('focus', 1);
               //container.select('.area.radar-chart-serie'+dd[1]).classed('focused', 1);
             })
