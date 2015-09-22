@@ -9,6 +9,7 @@ var RadarChart = {
     levelTick: false,
     TickLength: 10,
     maxValue: 0,
+    minValue: 0,
     radians: 2 * Math.PI,
     color: d3.scale.category10(),
     axisLine: true,
@@ -74,7 +75,8 @@ var RadarChart = {
         var maxValue = Math.max(cfg.maxValue, d3.max(data, function(d) {
           return d3.max(d.axes, function(o){ return o.value; });
         }));
-
+        maxValue -= cfg.minValue;
+        
         var allAxis = data[0].axes.map(function(i, j){ return {name: i.axis, xOffset: (i.xOffset)?i.xOffset:0, yOffset: (i.yOffset)?i.yOffset:0}; });
         var total = allAxis.length;
         var radius = cfg.factor * Math.min(cfg.w / 2, cfg.h / 2);
@@ -204,8 +206,8 @@ var RadarChart = {
         // content
         data.forEach(function(d){
           d.axes.forEach(function(axis, i) {
-            axis.x = (cfg.w/2-radius2)+getHorizontalPosition(i, radius2, (parseFloat(Math.max(axis.value, 0))/maxValue)*cfg.factor);
-            axis.y = (cfg.h/2-radius2)+getVerticalPosition(i, radius2, (parseFloat(Math.max(axis.value, 0))/maxValue)*cfg.factor);
+            axis.x = (cfg.w/2-radius2)+getHorizontalPosition(i, radius2, (parseFloat(Math.max(axis.value - cfg.minValue, 0))/maxValue)*cfg.factor);
+            axis.y = (cfg.h/2-radius2)+getVerticalPosition(i, radius2, (parseFloat(Math.max(axis.value - cfg.minValue, 0))/maxValue)*cfg.factor);
           });
         });
         var polygon = container.selectAll(".area").data(data, cfg.axisJoin);

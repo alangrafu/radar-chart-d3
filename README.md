@@ -103,6 +103,7 @@ chart.config({
   factorLegend: 1,
   levels: 3,
   maxValue: 0,
+  minValue: 0,
   radians: 2 * Math.PI,
   color: d3.scale.category10(), // pass a noop (function() {}) to decide color via css
   axisLine: true,
