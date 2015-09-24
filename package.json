@@ -6,6 +6,6 @@
   "main": "src/radar-chart.js",
   "style": "src/radar-chart.css",
   "dependencies": {
-    "d3": "~3.5.5",
-  },
+    "d3": "~3.5.5"
+  }
 }
