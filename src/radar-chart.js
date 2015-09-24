@@ -372,5 +372,4 @@ var RadarChart = {
       .call(chart);
   }
 };
-
-module.exports = RadarChart;
+var module = { exports: RadarChart };

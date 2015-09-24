@@ -2,10 +2,31 @@
   "name": "radar-chart-d3",
   "version": "1.2.0",
   "description": "Radar chart based on D3",
-  "license": "Apache",
+  "license": "Apache-2.0",
   "main": "src/radar-chart.js",
   "style": "src/radar-chart.css",
   "dependencies": {
     "d3": "~3.5.5"
-  }
+  },
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alangrafu/radar-chart-d3.git"
+  },
+  "keywords": [
+    "d3",
+    "radar",
+    "radar-chart",
+    "visualization"
+  ],
+  "author": "Alvaro Graves <alvaro@graves.cl> (http://graves.cl)",
+  "bugs": {
+    "url": "https://github.com/alangrafu/radar-chart-d3/issues"
+  },
+  "homepage": "https://github.com/alangrafu/radar-chart-d3#readme"
 }
