@@ -1,0 +1,10 @@
+{
+  "name": "radar-chart-d3",
+  "version": "1.2.0",
+  "license": "Apache",
+  "main": "src/radar-chart.js",
+  "style": "src/radar-chart.css",
+  "dependencies": {
+    "d3": "~3.5.5",
+  },
+}
