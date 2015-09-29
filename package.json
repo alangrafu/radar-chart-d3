@@ -1,6 +1,6 @@
 {
   "name": "radar-chart-d3",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Radar chart based on D3",
   "license": "Apache-2.0",
   "main": "src/radar-chart.js",
