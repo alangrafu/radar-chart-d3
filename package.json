@@ -12,7 +12,7 @@
     "example": "example"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "minify": "uglifyjs src/radar-chart.js --output src/radar-chart.min.js"
   },
   "repository": {
     "type": "git",
@@ -28,5 +28,8 @@
   "bugs": {
     "url": "https://github.com/alangrafu/radar-chart-d3/issues"
   },
-  "homepage": "https://github.com/alangrafu/radar-chart-d3#readme"
+  "homepage": "https://github.com/alangrafu/radar-chart-d3#readme",
+  "devDependencies": {
+    "uglify-js": "^2.6.1"
+  }
 }
