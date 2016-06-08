@@ -1,5 +1,5 @@
 ## Radar Chart
-A reusable radar chart implementation in D3.js. Styleable, configurable and transition enabled.
+A reusable radar chart implementation in D3.js. Styleable, configurable and transition-capable.
 
 [![Radar Example](http://bl.ocks.org/tpreusse/raw/2bc99d74a461b8c0acb1/thumbnail.png)](http://bl.ocks.org/tpreusse/2bc99d74a461b8c0acb1)
 
@@ -12,7 +12,7 @@ A reusable radar chart implementation in D3.js. Styleable, configurable and tran
 ```
 var data = [
   {
-    className: 'germany', // optional can be used for styling
+    className: 'germany', // optional, can be used for styling
     axes: [
       {axis: "strength", value: 13, yOffset: 10},
       {axis: "intelligence", value: 6},
@@ -96,7 +96,7 @@ game
 chart.config();
 // all options with default values
 chart.config({
-  containerClass: 'radar-chart', // target with css, default stylesheet targets .radar-chart
+  containerClass: 'radar-chart', // target with css, the default stylesheet targets .radar-chart
   w: 600,
   h: 600,
   factor: 0.95,
@@ -111,7 +111,7 @@ chart.config({
   circles: true,
   radius: 5,
   open: false,  // whether or not the last axis value should connect back to the first axis value
-                // consider modifying the chart opacity (see "Style with CSS" section above)
+                // if true, consider modifying the chart opacity (see "Style with CSS" section above)
   axisJoin: function(d, i) {
     return d.className || i;
   },
