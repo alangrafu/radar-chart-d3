@@ -35,7 +35,7 @@ var RadarChart = {
     // default config
     var cfg = Object.create(RadarChart.defaultConfig);
     function setTooltip(tooltip, msg){
-      if(msg == false || msg == undefined){
+      if(msg === false || msg == undefined){
         tooltip.classed("visible", 0);
         tooltip.select("rect").classed("visible", 0);
       }else{
