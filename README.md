@@ -126,7 +126,7 @@ chart.config({
 ```
 
 ## Example
-###CSV2Radar
+### CSV2Radar
 
 Display a csv file as a radar chart at [http://alangrafu.github.io/radar-chart-d3/csv2radar.html](http://alangrafu.github.io/radar-chart-d3/csv2radar.html).
 
