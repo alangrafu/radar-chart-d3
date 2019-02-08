@@ -83,6 +83,8 @@ var RadarChart = {
           return d3.max(d.axes, function(o){ return o.value; });
         }));
         maxValue -= cfg.minValue;
+	if (maxValue === 0)
+		maxValue = 1;
 
         var allAxis = data[0].axes.map(function(i, j){ return {name: i.axis, xOffset: (i.xOffset)?i.xOffset:0, yOffset: (i.yOffset)?i.yOffset:0}; });
         var total = allAxis.length;
